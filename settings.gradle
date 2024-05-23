@@ -1,0 +1,4 @@
+rootProject.name = 'subride'
+include 'common'
+include 'member:member-biz'
+include 'member:member-infra'
