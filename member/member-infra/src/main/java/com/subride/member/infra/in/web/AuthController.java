@@ -36,7 +36,7 @@ public class AuthController {
             authService.signup(authContollerHelper.getMemberFromRequest(signupRequestDTO),
                     authContollerHelper.getAccountFromRequest(signupRequestDTO));
 
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "회원가입 성공", "회원가입 성공"));
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "회원가입 성공", "회원 가입 되었습니다."));
         } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {
