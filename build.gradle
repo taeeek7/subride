@@ -33,8 +33,40 @@ allprojects {
 		implementation 'com.google.code.gson:gson:2.11.0'
 		compileOnly 'org.projectlombok:lombok:1.18.12'
 		annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+		//==============  For TEST
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+		//--JUnit, Mokito Test
+		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+		testImplementation 'org.mockito:mockito-core:3.12.4'
+		testImplementation 'org.mockito:mockito-junit-jupiter:3.12.4'
+
+		//-- spring security test
+		testImplementation 'org.springframework.security:spring-security-test'
+
+		//-- For mysql System test
+		testImplementation 'org.testcontainers:mysql:1.17.3'
+
+		//-- For WebMvc System test
+		implementation 'org.springframework.boot:spring-boot-starter-webflux'
+		//=============================================
 	}
+
+	//==== Test를 위한 설정 ===
+	sourceSets {
+		test {
+			java {
+				srcDirs = ['src/test/java']
+			}
+		}
+	}
+	test {
+		useJUnitPlatform()
+		include '**/*Test.class'
+	}
+	//==========================
 }
 
 subprojects {

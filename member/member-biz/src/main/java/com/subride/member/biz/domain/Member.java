@@ -11,4 +11,8 @@ public class Member {
     private String bankName;
     private String bankAccount;
     private int characterId;
+
+    public boolean canbeAccessed() {
+        return !userId.equalsIgnoreCase("user99");
+    }
 }

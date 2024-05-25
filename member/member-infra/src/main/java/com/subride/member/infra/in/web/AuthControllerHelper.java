@@ -10,7 +10,8 @@ import com.subride.member.infra.out.entity.AccountEntity;
 import com.subride.member.infra.out.entity.MemberEntity;
 import com.subride.member.infra.out.repo.IAccountRepository;
 import com.subride.member.infra.out.repo.IMemberRepository;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
@@ -18,14 +19,27 @@ import org.springframework.stereotype.Controller;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
-@RequiredArgsConstructor
-class AuthContollerHelper {
-    private final JwtTokenProvider jwtTokenProvider;
-    private final IMemberRepository memberRepository;
-    private final IAccountRepository accountRepository;
+public class AuthControllerHelper {
+    private JwtTokenProvider jwtTokenProvider;
+    private IMemberRepository memberRepository;
+    private IAccountRepository accountRepository;
 
-    JwtTokenDTO createToken(Member member) {
+    @Autowired
+    public AuthControllerHelper(JwtTokenProvider jwtTokenProvider, IMemberRepository memberRepository, IAccountRepository accountRepository) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.memberRepository = memberRepository;
+        this.accountRepository = accountRepository;
+    }
+
+    public AuthControllerHelper() {}
+
+    public void setJwtTokenProvider(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    public JwtTokenDTO createToken(Member member) {
         // 사용자의 계정 정보 가져오기
         AccountEntity account = accountRepository.findByUserId(member.getUserId())
                 .orElseThrow(() -> new InfraException("Account not found"));
@@ -40,15 +54,16 @@ class AuthContollerHelper {
         return jwtTokenProvider.createToken(memberEntity, authorities);
     }
 
-    int checkAccessToken(String token) {
+    public int checkAccessToken(String token) {
+        //log.info("*** checkAccessToken: {}", token);
         return jwtTokenProvider.validateToken(token);
     }
 
-    boolean isValidRefreshToken(String token) {
+    public boolean isValidRefreshToken(String token) {
         return jwtTokenProvider.validateRefreshToken(token);
     }
 
-    Member getMemberFromRequest(SignupRequestDTO signupRequestDTO) {
+    public Member getMemberFromRequest(SignupRequestDTO signupRequestDTO) {
         Member member = new Member();
         member.setUserId(signupRequestDTO.getUserId());
         member.setUserName(signupRequestDTO.getUserName());
@@ -57,7 +72,8 @@ class AuthContollerHelper {
         return member;
     }
 
-    Account getAccountFromRequest(SignupRequestDTO signupRequestDTO) {
+    public Account getAccountFromRequest(SignupRequestDTO signupRequestDTO) {
+        //log.info("*** getAccountFromRequest");
         Account account = new Account();
         account.setUserId(signupRequestDTO.getUserId());
         account.setPassword(signupRequestDTO.getPassword());
@@ -65,7 +81,8 @@ class AuthContollerHelper {
         return account;
     }
 
-    Member getMemberFromToken(String token) {
+    public Member getMemberFromToken(String token) {
+        //log.info("*** getMemberFromToken");
         String userId = jwtTokenProvider.getUserIdFromToken(token);
         MemberEntity member = memberRepository.findByUserId(userId)
                 .orElseThrow(() -> new InfraException("User not found"));

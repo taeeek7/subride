@@ -27,6 +27,6 @@ public class AuthServiceImpl implements IAuthService {
 
     @Override
     public boolean validateMemberAccess(Member member) {
-        return !member.getUserId().equalsIgnoreCase("user99");
+        return member.canbeAccessed();
     }
 }

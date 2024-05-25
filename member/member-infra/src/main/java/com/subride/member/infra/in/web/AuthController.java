@@ -27,14 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final IAuthService authService;
-    private final AuthContollerHelper authContollerHelper;
+    private final AuthControllerHelper authControllerHelper;
 
     @Operation(operationId = "auth-signup", summary = "회원가입", description = "회원가입을 처리합니다.")
     @PostMapping("/signup")
     public ResponseEntity<ResponseDTO<String>> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
         try {
-            authService.signup(authContollerHelper.getMemberFromRequest(signupRequestDTO),
-                    authContollerHelper.getAccountFromRequest(signupRequestDTO));
+            authService.signup(authControllerHelper.getMemberFromRequest(signupRequestDTO),
+                    authControllerHelper.getAccountFromRequest(signupRequestDTO));
 
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "회원가입 성공", "회원 가입 되었습니다."));
         } catch (InfraException e) {
@@ -50,7 +50,7 @@ public class AuthController {
         try {
             Member member = authService.login(loginRequestDTO.getUserId(), loginRequestDTO.getPassword());
             if (member != null) {
-                JwtTokenDTO jwtTokenDTO = authContollerHelper.createToken(member);
+                JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
                 return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "로그인 성공", jwtTokenDTO));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "로그인 실패"));
@@ -66,8 +66,10 @@ public class AuthController {
     @PostMapping("/verify")
     public ResponseEntity<ResponseDTO<Integer>> validate(@RequestBody JwtTokenVarifyDTO jwtTokenVarifyDTO) {
         try {
-            int result = authContollerHelper.checkAccessToken(jwtTokenVarifyDTO.getToken());
-            Member member = authContollerHelper.getMemberFromToken(jwtTokenVarifyDTO.getToken());
+            log.info("** verify: {}", jwtTokenVarifyDTO.getToken());
+            int result = authControllerHelper.checkAccessToken(jwtTokenVarifyDTO.getToken());
+            log.info("** RESULT: {}", result);
+            Member member = authControllerHelper.getMemberFromToken(jwtTokenVarifyDTO.getToken());
 
             if (member == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
@@ -89,13 +91,13 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<ResponseDTO<JwtTokenDTO>> refresh(@RequestBody JwtTokenRefreshDTO jwtTokenRefreshDTO) {
         try {
-            authContollerHelper.isValidRefreshToken(jwtTokenRefreshDTO.getRefreshToken());
-            Member member = authContollerHelper.getMemberFromToken(jwtTokenRefreshDTO.getRefreshToken());
+            authControllerHelper.isValidRefreshToken(jwtTokenRefreshDTO.getRefreshToken());
+            Member member = authControllerHelper.getMemberFromToken(jwtTokenRefreshDTO.getRefreshToken());
             if (member == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
             }
 
-            JwtTokenDTO jwtTokenDTO = authContollerHelper.createToken(member);
+            JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "토큰 갱신 성공", jwtTokenDTO));
         } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));

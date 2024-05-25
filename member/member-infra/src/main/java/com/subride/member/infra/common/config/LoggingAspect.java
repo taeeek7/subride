@@ -59,6 +59,8 @@ public class LoggingAspect {
                 } else if (arg instanceof Map) {
                     argString.append(((Map<?, ?>) arg).size()).append(" entries, ");
                 } else {
+                    argString.append(arg);
+                    /*
                     try {
                         String jsonString = gson.toJson(arg);
                         argString.append(jsonString).append(", ");
@@ -66,6 +68,8 @@ public class LoggingAspect {
                         log.warn("JSON serialization failed for argument: {}", arg);
                         argString.append("JSON serialization failed, ");
                     }
+                    */
+
                 }
             } else {
                 argString.append("null, ");
@@ -88,12 +92,16 @@ public class LoggingAspect {
             } else if (result instanceof Map) {
                 return ((Map<?, ?>) result).size() + " entries";
             } else {
+                return result.toString();
+                /*
                 try {
                     return gson.toJson(result);
                 } catch (Exception e) {
                     log.warn("JSON serialization failed for result: {}", result);
                     return "JSON serialization failed";
                 }
+
+                 */
             }
         } else {
             return "null";

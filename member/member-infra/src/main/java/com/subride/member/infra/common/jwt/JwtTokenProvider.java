@@ -12,6 +12,7 @@ import com.subride.member.infra.common.dto.JwtTokenDTO;
 import com.subride.member.infra.exception.InfraException;
 import com.subride.member.infra.out.entity.MemberEntity;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +27,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class JwtTokenProvider {
     private final Algorithm algorithm;
@@ -106,19 +108,25 @@ public class JwtTokenProvider {
     }
 
     public int validateToken(String token) {
+        log.info("******** validateToken: {}", token);
         try {
             JWTVerifier verifier = JWT.require(algorithm).build();
             verifier.verify(token);
             return 1; // 검사 성공 시 1 반환
         } catch (TokenExpiredException e) {
+            log.error("Token validation failed: {}", e.getMessage(), e);
             throw new InfraException(10, "토큰이 만료되었습니다.");
         } catch (SignatureVerificationException e) {
+            log.error("Token validation failed: {}", e.getMessage(), e);
             throw new InfraException(20, "서명 검증에 실패했습니다.");
         } catch (AlgorithmMismatchException e) {
+            log.error("AlgorithmMismatchException: {}", e.getMessage(), e);
             throw new InfraException(30, "알고리즘이 일치하지 않습니다.");
         } catch (InvalidClaimException e) {
+            log.error("InvalidClaimException: {}", e.getMessage(), e);
             throw new InfraException(40, "유효하지 않은 클레임입니다.");
         } catch (Exception e) {
+            log.error("Undefined Error: {}", e.getMessage(), e);
             throw new InfraException(50, "토큰 검증 중 예외가 발생했습니다.");
         }
     }
