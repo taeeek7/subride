@@ -12,13 +12,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.subride.member.infra.in.web.CommonTestUtils.createSignupRequest;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")     //application-test.yml의 설정을 적용
 public class AuthControllerSystemTest {
     @Autowired
     private WebApplicationContext context;
@@ -37,10 +37,14 @@ public class AuthControllerSystemTest {
                 .build();
     }
 
+    /*
+    @SprintBootTest는 기본적으로 @Transactional이 적용되어 테스트가 끝나면 데이터를 지움
+    뒤에 Login 테스트를 위해 지우지 않도록 설정함
+     */
     @Test
     void signup_success() {
         // Given
-        SignupRequestDTO signupRequestDTO = createSignupRequest();
+        SignupRequestDTO signupRequestDTO = CommonTestUtils.createSignupRequest();
 
         // When & Then
         webClient.post().uri("/api/auth/signup")
@@ -74,6 +78,13 @@ public class AuthControllerSystemTest {
     @Test
     void login_success() {
         // Given
+        SignupRequestDTO signupRequestDTO = CommonTestUtils.createSignupRequest();
+        webClient.post().uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(signupRequestDTO)
+                .exchange()
+                .expectStatus().isOk();
+
         LoginRequestDTO loginRequestDTO = CommonTestUtils.createLoginRequestDTO();
 
         // When & Then

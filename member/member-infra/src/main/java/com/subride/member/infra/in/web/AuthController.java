@@ -48,13 +48,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO<JwtTokenDTO>> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
-            log.info("*******1");
             Member member = authService.login(loginRequestDTO.getUserId(), loginRequestDTO.getPassword());
-            log.info("*******2");
             if (member != null) {
-                log.info("*******3");
                 JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
-                log.info("*******4");
                 return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "로그인 성공", jwtTokenDTO));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "로그인 실패"));
