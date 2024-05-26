@@ -33,6 +33,8 @@ public class AuthProviderImpl implements IAuthProvider {
                     new UsernamePasswordAuthenticationToken(userId, password));
         } catch (BadCredentialsException e) {
             throw new InfraException("ID/PW 검증 실패", e);
+        } catch (Exception e) {
+            throw new InfraException("ID/PW 검증 실패", e);
         }
 
         Optional<MemberEntity> optionalPersistentMember = memberRepository.findByUserId(userId);
@@ -42,12 +44,17 @@ public class AuthProviderImpl implements IAuthProvider {
     @Override
     @Transactional
     public void signup(Member member, Account account) {
-        MemberEntity memberEntity = MemberEntity.fromDomain(member);
-        memberRepository.save(memberEntity);
+        try {
+            MemberEntity memberEntity = MemberEntity.fromDomain(member);
+            memberRepository.save(memberEntity);
 
-        AccountEntity accountEntity = AccountEntity.fromDomain(account);
-        //-- 암호를 단방향 암호화함
-        accountEntity.setPassword(passwordEncoder.encode(account.getPassword()));
-        accountRepository.save(accountEntity);
+            AccountEntity accountEntity = AccountEntity.fromDomain(account);
+            //-- 암호를 단방향 암호화함
+            accountEntity.setPassword(passwordEncoder.encode(account.getPassword()));
+            accountRepository.save(accountEntity);
+        } catch (Exception e) {
+            throw new InfraException("데이터 저장 중 오류", e);
+        }
+
     }
 }

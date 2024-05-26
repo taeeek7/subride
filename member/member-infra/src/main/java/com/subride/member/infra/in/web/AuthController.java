@@ -38,7 +38,7 @@ public class AuthController {
 
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "회원가입 성공", "회원 가입 되었습니다."));
         } catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
         }
@@ -48,9 +48,13 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO<JwtTokenDTO>> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         try {
+            log.info("*******1");
             Member member = authService.login(loginRequestDTO.getUserId(), loginRequestDTO.getPassword());
+            log.info("*******2");
             if (member != null) {
+                log.info("*******3");
                 JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
+                log.info("*******4");
                 return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "로그인 성공", jwtTokenDTO));
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "로그인 실패"));

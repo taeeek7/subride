@@ -51,6 +51,12 @@ allprojects {
 
 		//-- For WebMvc System test
 		implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+		//-- lombok
+		// -- @SpringBootTest를 사용하여 전체 애플리케이션 컨텍스트를 로딩되는 테스트 코드에만 사용
+		// -- 그 외 단위나 컴포넌트 테스트에 사용하면 제대로 동작안함
+		testCompileOnly 'org.projectlombok:lombok:1.18.12'
+		testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
 		//=============================================
 	}
 

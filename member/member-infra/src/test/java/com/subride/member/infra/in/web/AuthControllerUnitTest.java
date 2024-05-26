@@ -9,7 +9,6 @@ import com.subride.member.infra.common.dto.JwtTokenRefreshDTO;
 import com.subride.member.infra.common.dto.JwtTokenVarifyDTO;
 import com.subride.member.infra.common.dto.SignupRequestDTO;
 import com.subride.member.infra.common.jwt.JwtTokenProvider;
-import com.subride.member.infra.out.entity.MemberEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,17 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +35,11 @@ import static org.mockito.Mockito.*;
 
 //-- 단위 테스트에는 모의 객체 생성 및 관리를 편하게 하기 위해 MockitoExtension을 사용함
 @ExtendWith(MockitoExtension.class)
+/*
+추가로 필요한 Bean객체 로딩
+- Controller클래스에 Spring security가 적용되므로 SucurtyConfig를 Import하여 필요한 Bean객체를 로딩해야함
+- JWT토큰 처리를 위해 JwtTokenProvider객체도 import해야 함
+*/
 public class AuthControllerUnitTest {
     //-- 필요한 모의 객체를 생성
     @Mock
@@ -52,11 +48,13 @@ public class AuthControllerUnitTest {
     //-------------------------------------
 
     //--- AuthControllerHelper에서 사용할 JwtTokenProvider 객체 생성
-    private String jwtSecret = getTestJwtSecret();
+    private String jwtSecret = CommonTestUtils.getTestJwtSecret();
     private long jwtExpirationTime = 3600;
     private long jwtRefreshTokenExpirationTime = 36000;
 
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
     private JwtTokenDTO jwtTokenDTO;
     //------------------
 
@@ -84,7 +82,7 @@ public class AuthControllerUnitTest {
         */
         jwtTokenProvider = new JwtTokenProvider(jwtSecret, jwtExpirationTime, jwtRefreshTokenExpirationTime);
         authControllerHelper.setJwtTokenProvider(jwtTokenProvider);
-        jwtTokenDTO = createTestToken();
+        jwtTokenDTO = CommonTestUtils.createTestToken(jwtTokenProvider);
     }
     //-----------------------------
 
@@ -207,38 +205,5 @@ public class AuthControllerUnitTest {
         //Then
         assertEquals(200, response.getBody().getCode());
         assertEquals(jwtTokenDTO.getAccessToken(), response.getBody().getResponse().getAccessToken());
-    }
-
-    //=============== Private functions ====================
-    private String getTestJwtSecret() {
-        SecureRandom random = new SecureRandom();
-        byte[] secretBytes = new byte[64];
-        random.nextBytes(secretBytes);
-        return Base64.getEncoder().encodeToString(secretBytes);
-    }
-
-    private JwtTokenDTO createTestToken() {
-        // 테스트 객체 생성
-        Member member = new Member();
-        member.setUserId("testuser");
-        member.setUserName("홍길동");
-        member.setBankName("KB");
-        member.setBankAccount("123-12222");
-        member.setCharacterId(1);
-
-        Account account = new Account();
-        account.setUserId(member.getUserId());
-        account.setPassword("password");
-        account.setRoles(new HashSet<>(Arrays.asList("USER", "ADMIN")));
-
-        // 사용자의 권한 정보 생성
-        Collection<? extends GrantedAuthority> authorities = account.getRoles().stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-
-        // 새로운 액세스 토큰 생성
-        MemberEntity memberEntity = MemberEntity.fromDomain(member);
-        return jwtTokenProvider.createToken(memberEntity, authorities);
-
     }
 }

@@ -68,8 +68,25 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+/*
+데이터 레포지토리 컨포넌트 테스트 예시
+- 목적: 데이터 CRUD 테스트
+- 방법: 실제 데이터베이스를 테스트 컨테이너로 실행하여 테스트
+ */
+@DataJpaTest    //Entity, Repository, JPA관련 설정만 로딩하여 데이터 액세스 테스트를 지원함
+//-- @DataJpaTest는 기본으로 내장 데이터베이스인 H2를 사용함. 이 테스트 DB를 사용하지 않겠다는 설정임
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+/*
+테스트 데이터베이스 설정: 컨테이너로 서비스에 사용하는 DB와 동일한 DB를 이용하도록 설정함
+- driver-class-name: 컨테이너화된 DB사용을 위한 DB driver 설정
+- url: 'jdbc:tc'뒤의 Mysql:8.0.29는 docker hub에 있는 image이름임.
+        '//'뒤에는 hostname을 지정하는데 빈 값이면 랜덤으로 지정됨
+        만약 docker hub외의 Image registry를 사용한다면 image path를 지정할 때 full path를 써주면 됨
+        전체경로 구성: {registry}/{organization}/{repository}:{tag}
+        예) myharbor.io/database/mysql:8.0.29
+- username, password: DB에 접속할 계정정보인데 아무거나 지정하면 됨
+- jpa.database-platform: DB엔진에 따른 Hibernate 유형 지정
+ */
 @TestPropertySource(properties = {
         "spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
         "spring.datasource.url=jdbc:tc:mysql:8.0.29:///member",
@@ -80,24 +97,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /*
 @DataJpaTest는 데이터 관련된 Bean만 로딩하므로 추가로 필요한 클래스는 Import 해 줘야 함
-추가 필요 클래스가 뭔지 찾는 가장 쉬운 방법은 실행하고 에러 메시지에서 찾는 방법임
+먼저 필요한 클래스를 추가하고 실행 시 에러 메시지를 보면서 추가해 나가면 됨
  */
 @Import({SecurityConfig.class, JwtTokenProvider.class, CustomUserDetailsService.class})
 class AuthProviderImplComponentTest {
+    private final IMemberRepository memberRepository;
+    private final IAccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     private AuthProviderImpl authProvider;
 
     @Autowired
-    private IMemberRepository memberRepository;
-
-    @Autowired
-    private IAccountRepository accountRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public AuthProviderImplComponentTest(IMemberRepository memberRepository, IAccountRepository accountRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+        this.memberRepository = memberRepository;
+        this.accountRepository = accountRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+    }
 
     @BeforeEach
     void setup() {
@@ -135,85 +152,8 @@ class AuthProviderImplComponentTest {
         assertThat(savedAccount.getUserId()).isEqualTo(account.getUserId());
         assertThat(passwordEncoder.matches(account.getPassword(), savedAccount.getPassword())).isTrue();
     }
-
 }
 
-
-// File: member/member-infra/src/test/java/com/subride/member/infra/out/adapter/AuthProviderImplSystemTest.java
-package com.subride.member.infra.out.adapter;
-
-import com.subride.member.biz.domain.Account;
-import com.subride.member.biz.domain.Member;
-import com.subride.member.infra.exception.InfraException;
-import com.subride.member.infra.out.entity.AccountEntity;
-import com.subride.member.infra.out.entity.MemberEntity;
-import com.subride.member.infra.out.repo.IAccountRepository;
-import com.subride.member.infra.out.repo.IMemberRepository;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.TestPropertySource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(properties = {
-        "spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
-        "spring.datasource.url=jdbc:tc:mysql:8.0.29:///member",
-        "spring.datasource.username=root",
-        "spring.datasource.password=Passw0rd$",
-        "spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect"
-})
-
-class AuthProviderImplSystemTest {
-
-    @Autowired
-    private AuthProviderImpl authProvider;
-
-    @Autowired
-    private IMemberRepository memberRepository;
-
-    @Autowired
-    private IAccountRepository accountRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Test
-    void signup_ValidInput_SavesMemberAndAccount() {
-        // given
-        Member member = new Member();
-        member.setUserId("testuser");
-        member.setUserName("John Doe");
-        member.setBankName("Test Bank");
-        member.setBankAccount("1234567890");
-
-        Account account = new Account();
-        account.setUserId("testuser");
-        account.setPassword("password");
-
-        // when
-        authProvider.signup(member, account);
-
-        // then
-        MemberEntity savedMember = memberRepository.findByUserId("testuser")
-                .orElseThrow(() -> new InfraException("Member not found"));
-
-        assertThat(savedMember.getUserId()).isEqualTo(member.getUserId());
-        assertThat(savedMember.getUserName()).isEqualTo(member.getUserName());
-        assertThat(savedMember.getBankName()).isEqualTo(member.getBankName());
-        assertThat(savedMember.getBankAccount()).isEqualTo(member.getBankAccount());
-
-        AccountEntity savedAccount = accountRepository.findByUserId("testuser")
-                .orElseThrow(() -> new InfraException("Account not found"));
-
-        assertThat(savedAccount.getUserId()).isEqualTo(account.getUserId());
-        assertThat(passwordEncoder.matches(account.getPassword(), savedAccount.getPassword())).isTrue();
-    }
-}
 
 // File: member/member-infra/src/test/java/com/subride/member/infra/in/web/MemberControllerUnitTest.java
 package com.subride.member.infra.in.web;
@@ -314,27 +254,22 @@ import com.subride.member.infra.common.dto.SignupRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
 public class AuthControllerSystemTest {
-
     @Autowired
     private WebApplicationContext context;
 
     @Autowired
-    private ObjectMapper objectMapper; // ObjectMapper 주입
+    private ObjectMapper objectMapper;
 
     private WebTestClient webClient;
-
 
     @BeforeEach
     void setup() {
@@ -345,15 +280,23 @@ public class AuthControllerSystemTest {
                 .build();
     }
 
-    @Test
-    void signup() {
+    // 테스트 데이터 생성 메서드
+    private SignupRequestDTO createSignupRequest() {
         SignupRequestDTO signupRequestDTO = new SignupRequestDTO();
         signupRequestDTO.setUserId("testuser");
         signupRequestDTO.setPassword("password");
         signupRequestDTO.setUserName("홍길동");
         signupRequestDTO.setBankName("KB");
         signupRequestDTO.setBankAccount("123-12222");
+        return signupRequestDTO;
+    }
 
+    @Test
+    void signup_success() {
+        // Given
+        SignupRequestDTO signupRequestDTO = createSignupRequest();
+
+        // When & Then
         webClient.post().uri("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(signupRequestDTO)
@@ -368,12 +311,27 @@ public class AuthControllerSystemTest {
     }
 
     @Test
-    @WithMockUser
-    void login() {
+    void signup_invalidRequest_badRequest() {
+        // Given
+        SignupRequestDTO signupRequestDTO = createSignupRequest();
+        signupRequestDTO.setUserId(null); // 잘못된 요청 데이터
+
+        // When & Then
+        webClient.post().uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(signupRequestDTO)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    void login_success() {
+        // Given
         LoginRequestDTO loginRequestDTO = new LoginRequestDTO();
         loginRequestDTO.setUserId("testuser");
         loginRequestDTO.setPassword("password");
 
+        // When & Then
         webClient.post().uri("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(loginRequestDTO)
@@ -384,18 +342,27 @@ public class AuthControllerSystemTest {
                     assert response.getCode() == 200;
                     assert response.getMessage().equals("로그인 성공");
 
-                    // JSON 변환을 위한 코드
                     JwtTokenDTO jwtToken = objectMapper.convertValue(response.getResponse(), JwtTokenDTO.class);
                     assert jwtToken.getAccessToken() != null;
                     assert jwtToken.getRefreshToken() != null;
-                    System.out.println("*** AccessToken: " + jwtToken.getAccessToken());
                 });
     }
 
-    // You can add more test methods for other endpoints like validate and refresh
+    @Test
+    void login_unauthorized_unauthorized() {
+        // Given
+        LoginRequestDTO loginRequestDTO = new LoginRequestDTO();
+        loginRequestDTO.setUserId("testuser");
+        loginRequestDTO.setPassword("wrongpassword");
 
+        // When & Then
+        webClient.post().uri("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(loginRequestDTO)
+                .exchange()
+                .expectStatus().isUnauthorized();
+    }
 }
-
 
 // File: member/member-infra/src/test/java/com/subride/member/infra/in/web/AuthControllerComponentTest.java
 // File: member/member-infra/src/test/java/com/subride/member/infra/in/web/AuthControllerComponentTest.java
@@ -426,23 +393,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /*
 컴포넌트 테스트 예시: Controller 테스트
-주요 포인트
--
+- 목적:
+    - API End point 호출: Http 요청에 매핑된 API가 호출되는지 검증
+    - 리턴값 검증: API 결과값이 잘 리턴되는지 테스트
+- 방법:
+    - MockMVC로 Http요청을 모방하고, API실행은 모의 Bean객체를 생성하여 Stubbing함으로써 실제 수행을 대체함
+    - MockBean을 생성된 객체는 아무것도 안하고 null을 리턴(단, void 리턴일때는 아무것도 안함)
 */
 @WebMvcTest(AuthController.class)
 class AuthControllerComponentTest {
-
+    //-- 모의 Http 객체이며 Bocking방식을 지원함
     @Autowired
     private MockMvc mockMvc;
 
+    //-- API실행 시 필요한 Bean객체에 대한 모의 객체 생성
     @MockBean
     private IAuthService authService;
-
     @MockBean
     private AuthControllerHelper authControllerHelper;
 
     private final Gson gson = new Gson();
 
+    //-- API가 Spring security를 사용하므로 테스트를 위한 설정을 함
     @TestConfiguration
     static class TestSecurityConfig {
         @Bean
@@ -457,6 +429,13 @@ class AuthControllerComponentTest {
         }
     }
 
+    /*
+    /api/auth/signup 요청 시 매핑된 authController.signup이 잘 호출되고, 리턴값이 정상적인지 테스트한다.
+    authController.signup 메서드는 내부적으로 authService.signup 메서드를 호출하는데,
+    authService는 @MockBean으로 모의 객체로 주입되었기 때문에 실제 로직은 수행되지 않고 가정된 동작만 수행한다.
+    @Mockbean으로 생성된 모의 객체는 어떠한 요청이든 수행 없이 null을 반환한다. 단, 리턴값이 void인 경우는 아무것도 하지 않는다.
+    authService.signup은 void를 리턴하기 때문에 아무런 수행과 에러 없이 처리되게 된다.
+    */
     @Test
     void signup_ValidInput_ReturnsSuccessResponse() throws Exception {
         // given
@@ -472,6 +451,10 @@ class AuthControllerComponentTest {
                 .andExpect(jsonPath("$.response").value("회원 가입 되었습니다."));
     }
 
+    /*
+    - 목적: 로그인 요청 시 API End point 테스트와 결과값 유효성 검증
+    - 방법: 로그인 시 실제 수행인 authService.login과 authControllerHelper.createToken을 모의수행으로 스터빙
+    */
     @Test
     void login_ValidCredentials_ReturnsJwtTokenDTO() throws Exception {
         // given
@@ -922,6 +905,8 @@ public class AuthProviderImpl implements IAuthProvider {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userId, password));
         } catch (BadCredentialsException e) {
+            throw new InfraException("ID/PW 검증 실패", e);
+        } catch (Exception e) {
             throw new InfraException("ID/PW 검증 실패", e);
         }
 
