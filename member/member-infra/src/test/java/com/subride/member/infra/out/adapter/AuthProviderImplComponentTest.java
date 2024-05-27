@@ -56,11 +56,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Import({SecurityConfig.class, JwtTokenProvider.class, CustomUserDetailsService.class})
 class AuthProviderImplComponentTest {
+    //-- 테스트 대상 객체 생성에 필요한 객체
     private final IMemberRepository memberRepository;
     private final IAccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    //-- 테스트 대상 객체
     private AuthProviderImpl authProvider;
 
     @Autowired

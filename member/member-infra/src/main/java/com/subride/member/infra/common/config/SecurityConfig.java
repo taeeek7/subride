@@ -1,5 +1,6 @@
 package com.subride.member.infra.common.config;
 
+import com.subride.member.infra.common.jwt.JwtAuthenticationFilter;
 import com.subride.member.infra.common.jwt.JwtTokenProvider;
 import com.subride.member.infra.common.jwt.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +46,7 @@ public class SecurityConfig {
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

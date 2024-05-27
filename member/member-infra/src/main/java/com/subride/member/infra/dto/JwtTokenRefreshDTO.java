@@ -1,4 +1,4 @@
-package com.subride.member.infra.common.dto;
+package com.subride.member.infra.dto;
 
 import lombok.Getter;
 import lombok.Setter;

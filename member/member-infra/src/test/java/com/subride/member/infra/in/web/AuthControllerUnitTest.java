@@ -4,10 +4,10 @@ import com.subride.common.dto.ResponseDTO;
 import com.subride.member.biz.domain.Account;
 import com.subride.member.biz.domain.Member;
 import com.subride.member.biz.usecase.inport.IAuthService;
-import com.subride.member.infra.common.dto.JwtTokenDTO;
-import com.subride.member.infra.common.dto.JwtTokenRefreshDTO;
-import com.subride.member.infra.common.dto.JwtTokenVarifyDTO;
-import com.subride.member.infra.common.dto.SignupRequestDTO;
+import com.subride.member.infra.dto.JwtTokenDTO;
+import com.subride.member.infra.dto.JwtTokenRefreshDTO;
+import com.subride.member.infra.dto.JwtTokenVarifyDTO;
+import com.subride.member.infra.dto.SignupRequestDTO;
 import com.subride.member.infra.common.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ public class AuthControllerUnitTest {
 
     //-------------------------------------
 
-    //--- AuthControllerHelper에서 사용할 JwtTokenProvider 객체 생성
+    //--- AuthControllerHelper에서 사용할 CommonJwtTokenProvider 객체 생성
     private String jwtSecret = CommonTestUtils.getTestJwtSecret();
     private long jwtExpirationTime = 3600;
     private long jwtRefreshTokenExpirationTime = 36000;

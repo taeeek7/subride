@@ -2,7 +2,7 @@ package com.subride.member.infra.in.web;
 
 import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
-import com.subride.member.infra.common.dto.MemberInfoDTO;
+import com.subride.member.infra.dto.MemberInfoDTO;
 import com.subride.member.infra.exception.InfraException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "bearerAuth")   //이 어노테이션이 없으면 요청 헤더에 Authorization헤더가 안 생김
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
 @Tag(name = "MemberEntity API", description = "회원 관련 API")

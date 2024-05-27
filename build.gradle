@@ -28,9 +28,9 @@ allprojects {
 
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
-		implementation 'commons-beanutils:commons-beanutils:1.9.4'
 		implementation 'org.springframework.boot:spring-boot-starter-aop'
-		implementation 'com.google.code.gson:gson:2.11.0'
+		implementation 'com.google.code.gson:gson:2.11.0'				//Json처리
+		implementation 'org.apache.commons:commons-collections4:4.4'	//apache공통모듈(예:BeanUtils)
 		compileOnly 'org.projectlombok:lombok:1.18.12'
 		annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
@@ -47,7 +47,7 @@ allprojects {
 		testImplementation 'org.springframework.security:spring-security-test'
 
 		//-- For mysql System test
-		testImplementation 'org.testcontainers:mysql:1.17.3'
+		testImplementation 'org.testcontainers:mysql:1.19.8'
 
 		//-- For WebMvc System test
 		implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -87,11 +87,11 @@ project(':common') {
 configure(subprojects.findAll { it.name.endsWith('-infra') }) {
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
-		implementation 'org.springframework.boot:spring-boot-starter-security'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
-		implementation 'com.auth0:java-jwt:4.4.0'
 		runtimeOnly 'com.mysql:mysql-connector-j'
+		implementation 'org.springframework.boot:spring-boot-starter-security'
+		implementation 'com.auth0:java-jwt:4.4.0'
 	}
 }
 

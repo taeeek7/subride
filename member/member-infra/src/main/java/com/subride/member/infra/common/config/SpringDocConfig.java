@@ -21,8 +21,8 @@ public class SpringDocConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Subride MemberEntity API")
+                        .title("회원 서비스 API")
                         .version("v1.0.0")
-                        .description("Subride 회원 서비스 API 명세서입니다."));
+                        .description("회원 서비스 API 명세서입니다."));
     }
 }

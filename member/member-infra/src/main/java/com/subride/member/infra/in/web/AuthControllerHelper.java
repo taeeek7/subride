@@ -2,8 +2,8 @@ package com.subride.member.infra.in.web;
 
 import com.subride.member.biz.domain.Account;
 import com.subride.member.biz.domain.Member;
-import com.subride.member.infra.common.dto.JwtTokenDTO;
-import com.subride.member.infra.common.dto.SignupRequestDTO;
+import com.subride.member.infra.dto.JwtTokenDTO;
+import com.subride.member.infra.dto.SignupRequestDTO;
 import com.subride.member.infra.common.jwt.JwtTokenProvider;
 import com.subride.member.infra.exception.InfraException;
 import com.subride.member.infra.out.entity.AccountEntity;

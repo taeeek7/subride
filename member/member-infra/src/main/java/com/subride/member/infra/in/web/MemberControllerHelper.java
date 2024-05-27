@@ -1,6 +1,6 @@
 package com.subride.member.infra.in.web;
 
-import com.subride.member.infra.common.dto.MemberInfoDTO;
+import com.subride.member.infra.dto.MemberInfoDTO;
 import com.subride.member.infra.exception.InfraException;
 import com.subride.member.infra.out.entity.MemberEntity;
 import com.subride.member.infra.out.repo.IMemberRepository;

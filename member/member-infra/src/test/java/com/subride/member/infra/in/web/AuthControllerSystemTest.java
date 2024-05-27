@@ -2,9 +2,9 @@ package com.subride.member.infra.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subride.common.dto.ResponseDTO;
-import com.subride.member.infra.common.dto.JwtTokenDTO;
-import com.subride.member.infra.common.dto.LoginRequestDTO;
-import com.subride.member.infra.common.dto.SignupRequestDTO;
+import com.subride.member.infra.dto.JwtTokenDTO;
+import com.subride.member.infra.dto.LoginRequestDTO;
+import com.subride.member.infra.dto.SignupRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

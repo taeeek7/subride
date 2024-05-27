@@ -4,7 +4,7 @@ import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
 import com.subride.member.biz.domain.Member;
 import com.subride.member.biz.usecase.inport.IAuthService;
-import com.subride.member.infra.common.dto.*;
+import com.subride.member.infra.dto.*;
 import com.subride.member.infra.exception.InfraException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -5,7 +5,7 @@ spring:
     name: ${SPRING_APPLICATION_NAME:member-service}
   datasource:
     driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
-    url: ${DB_URL:jdbc:mysql://localhost:3306/member?serverTimezone=Asia/Seoul}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/member?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:P@ssw0rd$}
   jpa:
@@ -22,8 +22,8 @@ springdoc:
     path: /swagger-ui.html
 jwt:
   secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
-  expiration-time: ${JWT_EXPIRATION_TIME:3600}
-  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME:36000}
+  expiration-time: ${JWT_EXPIRATION_TIME:36000}
+  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME:360000}
 
 # Logging
 logging:
