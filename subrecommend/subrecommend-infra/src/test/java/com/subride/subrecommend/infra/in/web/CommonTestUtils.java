@@ -7,8 +7,8 @@ public class CommonTestUtils {
 
     public static Category createCategory() {
         Category category = new Category();
-        category.setId(4L);
-        category.setName("FOOD");
+        category.setCategoryId("food");
+        category.setCategoryName("음식");
         category.setSpendingCategory("Food");
         return category;
     }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ISubRepository extends JpaRepository<SubEntity, Long> {
-    List<SubEntity> findByCategoryIdOrderByName(Long categoryId);
+    List<SubEntity> findByCategory_CategoryIdOrderByName(String categoryId);
     Optional<SubEntity> findByName(String name);
 }
 

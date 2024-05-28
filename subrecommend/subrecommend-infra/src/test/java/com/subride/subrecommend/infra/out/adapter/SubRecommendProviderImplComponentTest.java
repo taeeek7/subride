@@ -63,7 +63,6 @@ public class SubRecommendProviderImplComponentTest {
     private final ISubRepository subRepository;
 
     private SubRecommendProviderImpl subRecommendProvider;
-    private Long testCategoryId;
 
     @Autowired
     public SubRecommendProviderImplComponentTest(ISpendingRepository spendingRepository, ICategoryRepository categoryRepository, ISubRepository subRepository) {
@@ -81,10 +80,8 @@ public class SubRecommendProviderImplComponentTest {
         List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
         categoryRepository.saveAll(categories);
 
-        Map<String, CategoryEntity> categoryEntities = TestDataGenerator.getCategoryEntities(categoryRepository);
-        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categoryEntities);
+        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
         subRepository.saveAll(subs);
-        testCategoryId = categoryEntities.get("Life").getId();
 
         //-- Life 소비 카테고리의 지출이 가장 많게 테스트 데이터를 넣음
         SpendingEntity spendingEntity = new SpendingEntity();
@@ -125,21 +122,21 @@ public class SubRecommendProviderImplComponentTest {
         Category category = subRecommendProvider.getCategoryBySpendingCategory(spendingCategory);
 
         //-- Then
-        assertThat(category.getName()).isEqualTo("생필품");
+        assertThat(category.getCategoryName()).isEqualTo("생필품");
         assertThat(category.getSpendingCategory()).isEqualTo("Life");
     }
 
     @Test
     void getSubListByCategoryId() {
         //-- Given
-        Long categoryId = testCategoryId;
+        String categoryId = "life";
 
         //-- When
         List<Sub> subList = subRecommendProvider.getSubListByCategoryId(categoryId);
 
         //-- Then
         assertThat(subList).isNotEmpty();
-        assertThat(subList.get(0).getCategory().getId()).isEqualTo(categoryId);
+        assertThat(subList.get(0).getCategory().getCategoryId()).isEqualTo(categoryId);
     }
 
 }

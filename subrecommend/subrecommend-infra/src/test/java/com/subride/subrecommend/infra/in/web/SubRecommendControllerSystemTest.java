@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
-import java.util.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -47,7 +46,6 @@ public class SubRecommendControllerSystemTest {
 
     private WebTestClient webClient;
 
-    private Long testCategoryId;
     private Long testSubId;
 
     @BeforeEach
@@ -64,9 +62,7 @@ public class SubRecommendControllerSystemTest {
         List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
         categoryRepository.saveAll(categories);
 
-        Map<String, CategoryEntity> categoryEntities = TestDataGenerator.getCategoryEntities(categoryRepository);
-        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categoryEntities);
-        testCategoryId = categoryEntities.get("Life").getId();
+        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
         subRepository.saveAll(subs);
         SubEntity subEntity = subRepository.findByName("넷플릭스")
                 .orElseThrow(() -> new InfraException("Category not found"));
@@ -113,7 +109,7 @@ public class SubRecommendControllerSystemTest {
     @WithMockUser
     void getRecommendSubList_success() {
         // Given
-        Long categoryId = testCategoryId;
+        String categoryId = "life";
 
         // When & Then
         webClient.get().uri("/api/subrecommend/list?categoryId=" + categoryId)

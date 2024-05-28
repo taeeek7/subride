@@ -13,7 +13,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 
 @Component
 @SuppressWarnings("unused")
@@ -32,9 +31,7 @@ public class DataInitializer implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
         categoryRepository.saveAll(categories);
-
-        Map<String, CategoryEntity> categoryEntities = TestDataGenerator.getCategoryEntities(categoryRepository);
-        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categoryEntities);
+        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
         subRepository.saveAll(subs);
 
         String[] userIds = {"user01", "user02", "user03", "user04", "user05"};

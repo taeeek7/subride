@@ -5,6 +5,7 @@ import com.subride.subrecommend.biz.dto.SubInfoDTO;
 import java.util.List;
 
 public interface ISubRecommendService {
+    List<CategoryInfoDTO> getAllCategories();
     CategoryInfoDTO getRecommendCategoryBySpending(String userId);
-    List<SubInfoDTO> getRecommendSubListByCategory(Long categoryId);
+    List<SubInfoDTO> getRecommendSubListByCategory(String categoryId);
 }

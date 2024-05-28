@@ -25,6 +25,14 @@ public class SubRecommendProviderImpl implements ISubRecommendProvider {
     private final ISubRepository subRepository;
 
     @Override
+    public List<Category> getAllCategories() {
+        List<CategoryEntity> categoryEntities = categoryRepository.findAll();
+        return categoryEntities.stream()
+                .map(CategoryEntity::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Map<String, Long> getSpendingByCategory(String userId) {
         return spendingRepository.getSpendingByCategory(userId)
                 .stream()
@@ -39,8 +47,8 @@ public class SubRecommendProviderImpl implements ISubRecommendProvider {
     }
 
     @Override
-    public List<Sub> getSubListByCategoryId(Long categoryId) {
-        List<SubEntity> subEntities = subRepository.findByCategoryIdOrderByName(categoryId);
+    public List<Sub> getSubListByCategoryId(String categoryId) {
+        List<SubEntity> subEntities = subRepository.findByCategory_CategoryIdOrderByName(categoryId);
         return subEntities.stream()
                 .map(SubEntity::toDomain)
                 .collect(Collectors.toList());

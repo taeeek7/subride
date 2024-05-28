@@ -31,6 +31,19 @@ public class SubRecommendController {
     private final ISubRecommendService subRecommendService;
     private final SubRecommendControllerHelper subRecommendControllerHelper;
 
+    @Operation(summary = "모든 구독 카테고리 리스트 조회", description = "모든 구독 카테고리 정보를 리턴합니다.")
+    @GetMapping("/categories")
+    public ResponseEntity<ResponseDTO<List<CategoryInfoDTO>>> getAllCategories() {
+        try {
+            List<CategoryInfoDTO> categories = subRecommendService.getAllCategories();
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 카테고리 리스트 리턴", categories));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
+    }
+
     @Operation(summary = "사용자 소비에 맞는 구독 카테고리 구하기",
             description = "최고 소비 카테고리와 매핑된 구독 카테고리의 Id, 이름, 소비액 총합을 리턴함")
     @Parameters({
@@ -53,7 +66,7 @@ public class SubRecommendController {
         @Parameter(name = "categoryId", in = ParameterIn.QUERY, description = "카테고리ID", required = true)
     })
     @GetMapping("/list")
-    public ResponseEntity<ResponseDTO<List<SubInfoDTO>>> getRecommendSubList(@RequestParam Long categoryId) {
+    public ResponseEntity<ResponseDTO<List<SubInfoDTO>>> getRecommendSubList(@RequestParam String categoryId) {
         try {
             List<SubInfoDTO> subInfoDTOList = subRecommendService.getRecommendSubListByCategory(categoryId);
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독서비스 리턴", subInfoDTOList));

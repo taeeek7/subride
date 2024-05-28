@@ -7,6 +7,7 @@ import lombok.Setter;
 public class SubDTO {
     private Long id;
     private String name;
+    private String logo;
     private String description;
     private Long fee;
     private int maxShareNum;

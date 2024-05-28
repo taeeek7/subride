@@ -54,80 +54,6 @@ dependencies {
     implementation project(':member:member-biz')
 }
 
-// File: member/member-infra/build/resources/main/application-test.yml
-server:
-  port: ${SERVER_PORT:18080}
-spring:
-  application:
-    name: ${SPRING_APPLICATION_NAME:member-service}
-  datasource:
-    driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
-    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///member}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:P@ssw0rd$}
-  jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: ${JPA_SHOW_SQL:false}
-    hibernate:
-      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
-    properties:
-      hibernate:
-        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-jwt:
-  secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
-  expiration-time: ${JWT_EXPIRATION_TIME:3600}
-  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME:36000}
-
-# Logging
-logging:
-  level:
-    root: INFO
-    com.subride.member.infra.in: DEBUG
-    com.subride.member.infra.out: DEBUG
-
-
-
-// File: member/member-infra/build/resources/main/application.yml
-server:
-  port: ${SERVER_PORT:18080}
-spring:
-  application:
-    name: ${SPRING_APPLICATION_NAME:member-service}
-  datasource:
-    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
-    url: ${DB_URL:jdbc:mysql://localhost:3306/member?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:P@ssw0rd$}
-  jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: ${JPA_SHOW_SQL:false}
-    hibernate:
-      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
-    properties:
-      hibernate:
-        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-jwt:
-  secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
-  expiration-time: ${JWT_EXPIRATION_TIME:3600}
-  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME:36000}
-
-# Logging
-logging:
-  level:
-    root: INFO
-    com.subride.member.infra.in: DEBUG
-    com.subride.member.infra.out: DEBUG
-
-
-
 // File: member/member-infra/src/test/java/com/subride/member/infra/out/adapter/AuthProviderImplComponentTest.java
 package com.subride.member.infra.out.adapter;
 
@@ -187,11 +113,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @Import({SecurityConfig.class, JwtTokenProvider.class, CustomUserDetailsService.class})
 class AuthProviderImplComponentTest {
+    //-- 테스트 대상 객체 생성에 필요한 객체
     private final IMemberRepository memberRepository;
     private final IAccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
+    //-- 테스트 대상 객체
     private AuthProviderImpl authProvider;
 
     @Autowired
@@ -1061,8 +989,8 @@ springdoc:
     path: /swagger-ui.html
 jwt:
   secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
-  expiration-time: ${JWT_EXPIRATION_TIME:3600}
-  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME:36000}
+  expiration-time: ${JWT_EXPIRATION_TIME:36000}
+  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME:360000}
 
 # Logging
 logging:
@@ -1625,7 +1553,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@SecurityRequirement(name = "bearerAuth")
+@SecurityRequirement(name = "bearerAuth")   //이 어노테이션이 없으면 요청 헤더에 Authorization헤더가 안 생김
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
 @Tag(name = "MemberEntity API", description = "회원 관련 API")
@@ -2417,6 +2345,40 @@ dependencies {
     implementation project(':subrecommend:subrecommend-biz')
 }
 
+// File: subrecommend/subrecommend-infra/build/resources/main/application-test.yml
+server:
+  port: ${SERVER_PORT:18081}
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:subrecommend-service}
+  datasource:
+    driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
+    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///subrecommend}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:P@ssw0rd$}
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: ${JPA_SHOW_SQL:false}
+    hibernate:
+      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
+    properties:
+      hibernate:
+        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
+jwt:
+  secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    com.subride.subrecommend.infra.in: DEBUG
+    com.subride.subrecommend.infra.out: DEBUG
+
+
+
+
 // File: subrecommend/subrecommend-infra/build/resources/main/application.yml
 server:
   port: ${SERVER_PORT:18081}
@@ -2440,6 +2402,531 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+jwt:
+  secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    com.subride.subrecommend.infra.in: DEBUG
+    com.subride.subrecommend.infra.out: DEBUG
+
+
+
+
+// File: subrecommend/subrecommend-infra/src/test/java/com/subride/subrecommend/infra/out/adapter/SubRecommendProviderImplComponentTest.java
+package com.subride.subrecommend.infra.out.adapter;
+
+import com.subride.subrecommend.biz.domain.Category;
+import com.subride.subrecommend.biz.domain.Sub;
+import com.subride.subrecommend.infra.common.config.SecurityConfig;
+import com.subride.subrecommend.infra.common.jwt.JwtTokenProvider;
+import com.subride.subrecommend.infra.common.util.TestDataGenerator;
+import com.subride.subrecommend.infra.out.entity.CategoryEntity;
+import com.subride.subrecommend.infra.out.entity.SpendingEntity;
+import com.subride.subrecommend.infra.out.entity.SubEntity;
+import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
+import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
+import com.subride.subrecommend.infra.out.repo.ISubRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/*
+데이터 레포지토리 컨포넌트 테스트 예시
+- 목적: 데이터 CRUD 테스트
+- 방법: 실제 데이터베이스를 테스트 컨테이너로 실행하여 테스트
+ */
+@DataJpaTest    //Entity, Repository, JPA관련 설정만 로딩하여 데이터 액세스 테스트를 지원함
+//-- @DataJpaTest는 기본으로 내장 데이터베이스인 H2를 사용함. 이 테스트 DB를 사용하지 않겠다는 설정임
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+/*
+테스트 데이터베이스 설정: 컨테이너로 서비스에 사용하는 DB와 동일한 DB를 이용하도록 설정함
+- driver-class-name: 컨테이너화된 DB사용을 위한 DB driver 설정
+- url: 'jdbc:tc'뒤의 Mysql:8.0.29는 docker hub에 있는 image이름임.
+        '//'뒤에는 hostname을 지정하는데 빈 값이면 랜덤으로 지정됨
+        만약 docker hub외의 Image registry를 사용한다면 image path를 지정할 때 full path를 써주면 됨
+        전체경로 구성: {registry}/{organization}/{repository}:{tag}
+        예) myharbor.io/database/mysql:8.0.29
+- username, password: DB에 접속할 계정정보인데 아무거나 지정하면 됨
+- jpa.database-platform: DB엔진에 따른 Hibernate 유형 지정
+ */
+@TestPropertySource(properties = {
+        "spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
+        "spring.datasource.url=jdbc:tc:mysql:8.0.29:///subrecommend",
+        "spring.datasource.username=root",
+        "spring.datasource.password=P@ssw0rd$",
+        "spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect"
+})
+
+/*
+@DataJpaTest는 데이터 관련된 Bean만 로딩하므로 추가로 필요한 클래스는 Import 해 줘야 함
+먼저 필요한 클래스를 추가하고 실행 시 에러 메시지를 보면서 추가해 나가면 됨
+ */
+@Import({SecurityConfig.class, JwtTokenProvider.class})
+public class SubRecommendProviderImplComponentTest {
+    private final ISpendingRepository spendingRepository;
+    private final ICategoryRepository categoryRepository;
+    private final ISubRepository subRepository;
+
+    private SubRecommendProviderImpl subRecommendProvider;
+
+    @Autowired
+    public SubRecommendProviderImplComponentTest(ISpendingRepository spendingRepository, ICategoryRepository categoryRepository, ISubRepository subRepository) {
+        this.spendingRepository = spendingRepository;
+        this.categoryRepository = categoryRepository;
+        this.subRepository = subRepository;
+    }
+
+    @BeforeEach
+    void setup() {
+        subRecommendProvider = new SubRecommendProviderImpl(spendingRepository, categoryRepository, subRepository);
+
+        cleanup();  //테스트 데이터 모두 지움
+
+        List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
+        categoryRepository.saveAll(categories);
+
+        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
+        subRepository.saveAll(subs);
+
+        //-- Life 소비 카테고리의 지출이 가장 많게 테스트 데이터를 넣음
+        SpendingEntity spendingEntity = new SpendingEntity();
+        spendingEntity.setUserId("user01");
+        spendingEntity.setCategory("Life");
+        spendingEntity.setAmount(10000000L);
+        spendingRepository.save(spendingEntity);
+
+    }
+    @AfterEach
+    void cleanup() {
+        // 테스트 데이터 삭제
+        spendingRepository.deleteAll();
+        subRepository.deleteAll();
+        categoryRepository.deleteAll();
+    }
+
+    //-- 소비가 가장 많은 소비 카테고리와 총액 리턴 테스트
+    @Test
+    void getSpendingByCategory() {
+        //-- Given
+        String userId = "user01";
+
+        //-- When
+        Map<String, Long> spendingCategory = subRecommendProvider.getSpendingByCategory(userId);
+
+        //-- Then
+        assertThat(spendingCategory).containsEntry("Life", 10000000L);
+        assertThat(spendingCategory.size()).isEqualTo(1);
+    }
+
+    @Test
+    void getCategoryBySpendingCategory() {
+        //-- Given
+        String spendingCategory = "Life";
+
+        //-- When
+        Category category = subRecommendProvider.getCategoryBySpendingCategory(spendingCategory);
+
+        //-- Then
+        assertThat(category.getCategoryName()).isEqualTo("생필품");
+        assertThat(category.getSpendingCategory()).isEqualTo("Life");
+    }
+
+    @Test
+    void getSubListByCategoryId() {
+        //-- Given
+        String categoryId = "life";
+
+        //-- When
+        List<Sub> subList = subRecommendProvider.getSubListByCategoryId(categoryId);
+
+        //-- Then
+        assertThat(subList).isNotEmpty();
+        assertThat(subList.get(0).getCategory().getCategoryId()).isEqualTo(categoryId);
+    }
+
+}
+
+
+// File: subrecommend/subrecommend-infra/src/test/java/com/subride/subrecommend/infra/in/web/SubRecommendControllerSystemTest.java
+package com.subride.subrecommend.infra.in.web;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.subride.common.dto.ResponseDTO;
+import com.subride.subrecommend.biz.dto.CategoryInfoDTO;
+import com.subride.subrecommend.biz.dto.SubInfoDTO;
+import com.subride.subrecommend.infra.common.util.TestDataGenerator;
+import com.subride.subrecommend.infra.exception.InfraException;
+import com.subride.subrecommend.infra.out.entity.CategoryEntity;
+import com.subride.subrecommend.infra.out.entity.SpendingEntity;
+import com.subride.subrecommend.infra.out.entity.SubEntity;
+import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
+import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
+import com.subride.subrecommend.infra.out.repo.ISubRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
+import org.springframework.web.context.WebApplicationContext;
+
+import java.util.List;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
+public class SubRecommendControllerSystemTest {
+    @Autowired
+    private WebApplicationContext context;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private ICategoryRepository categoryRepository;
+
+    @Autowired
+    private ISubRepository subRepository;
+
+    @Autowired
+    private ISpendingRepository spendingRepository;
+
+    private WebTestClient webClient;
+
+    private Long testSubId;
+
+    @BeforeEach
+    void setup() {
+        webClient = MockMvcWebTestClient
+                .bindToApplicationContext(context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .configureClient()
+                .build();
+
+       cleanup();  //테스트 데이터 모두 지움
+
+        // 테스트 데이터 생성
+        List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
+        categoryRepository.saveAll(categories);
+
+        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
+        subRepository.saveAll(subs);
+        SubEntity subEntity = subRepository.findByName("넷플릭스")
+                .orElseThrow(() -> new InfraException("Category not found"));
+        testSubId = subEntity.getId();
+
+        // 지출 데이터 생성
+        String[] userIds = {"user01", "user02", "user03", "user04", "user05"};
+        String[] categoryNames = categories.stream().map(CategoryEntity::getSpendingCategory).toArray(String[]::new);
+        List<SpendingEntity> spendings = TestDataGenerator.generateSpendingEntities(userIds, categoryNames);
+        spendingRepository.saveAll(spendings);
+
+    }
+
+    @AfterEach
+    void cleanup() {
+        // 테스트 데이터 삭제
+        spendingRepository.deleteAll();
+        subRepository.deleteAll();
+        categoryRepository.deleteAll();
+    }
+
+    @Test
+    @WithMockUser
+    void getRecommendCategory_success() {
+        // Given
+        String userId = "user01";
+
+        // When & Then
+        webClient.get().uri("/api/subrecommend/category?userId=" + userId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ResponseDTO.class)
+                .value(response -> {
+                    assert response.getCode() == 200;
+
+                    CategoryInfoDTO categoryInfo = objectMapper.convertValue(response.getResponse(), CategoryInfoDTO.class);
+                    assert categoryInfo.getCategoryId() != null;
+                    assert categoryInfo.getCategoryName() != null;
+                    assert categoryInfo.getTotalSpending() != null;
+                });
+    }
+
+    @Test
+    @WithMockUser
+    void getRecommendSubList_success() {
+        // Given
+        String categoryId = "life";
+
+        // When & Then
+        webClient.get().uri("/api/subrecommend/list?categoryId=" + categoryId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ResponseDTO.class)
+                .value(response -> {
+                    assert response.getCode() == 200;
+                    //assert response.getMessage().equals("추천 구독 목록 조회 성공");
+
+                    List<SubInfoDTO> subList = objectMapper.convertValue(response.getResponse(), List.class);
+                    assert subList.size() > 0;
+                });
+    }
+
+    @Test
+    @WithMockUser
+    void getSubDetail_success() {
+        // Given
+        Long subId = testSubId;
+
+        // When & Then
+        webClient.get().uri("/api/subrecommend/detail/" + subId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ResponseDTO.class)
+                .value(response -> {
+                    assert response.getCode() == 200;
+                    //assert response.getMessage().equals("구독 상세 정보 조회 성공");
+
+                    SubInfoDTO subInfo = objectMapper.convertValue(response.getResponse(), SubInfoDTO.class);
+                    assert subInfo.getId().equals(subId);
+                    assert subInfo.getName() != null;
+                    assert subInfo.getDescription() != null;
+                    assert subInfo.getFee() != null;
+                    assert subInfo.getMaxShareNum() > 0;
+                });
+    }
+}
+
+// File: subrecommend/subrecommend-infra/src/test/java/com/subride/subrecommend/infra/in/web/SubRecommendControllerComponentTest.java
+package com.subride.subrecommend.infra.in.web;
+
+import com.subride.subrecommend.biz.domain.Category;
+import com.subride.subrecommend.biz.domain.Sub;
+import com.subride.subrecommend.biz.usecase.service.SubRecommendServiceImpl;
+import com.subride.subrecommend.infra.common.config.SecurityConfig;
+import com.subride.subrecommend.infra.common.jwt.JwtTokenProvider;
+import com.subride.subrecommend.infra.out.adapter.SubRecommendProviderImpl;
+import com.subride.subrecommend.infra.out.entity.SubEntity;
+import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
+import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
+import com.subride.subrecommend.infra.out.repo.ISubRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.*;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+/*
+컴포넌트 테스트 예시: Controller 테스트(SpyBean객체 이용)
+- 목적:
+    - API End point 호출: Http 요청에 매핑된 API가 호출되는지 검증
+    - 데이터 처리를 제외한 API 수행
+    - 리턴값 검증: API 결과값이 잘 리턴되는지 테스트
+- 방법:
+    - MockMVC로 Http요청을 모방하고, @SpyBean객체로 데이터 처리를 제외한 API실행
+    - 데이터 처리 관련한 객체는 @Mock을 이용하여 모의 객체로 생성
+*/
+@WebMvcTest(SubRecommendController.class)
+/*
+추가로 필요한 Bean객체 로딩
+- Controller클래스에 Spring security가 적용되므로 SucurtyConfig를 Import하여 필요한 Bean객체를 로딩해야함
+- JWT토큰 처리를 위해 JwtTokenProvider객체도 import해야 함
+*/
+@Import({SecurityConfig.class, JwtTokenProvider.class})
+public class SubRecommendControllerComponentTest {
+    /*
+    모의 Http 객체이며 Bocking방식을 지원함
+    @WebMvcTest는 @Controller와 @ControllerAdvice로 생성된 Bean 클래스를 자동으로 생성함
+    즉, AuthController 클래스는 자동으로 생성됨
+    하지만 @Component, @Service, @Repository 등의 애노테이션이 붙은 클래스는 스캔하지 않기 때문에 자동 생성되지 않음
+     */
+    @Autowired
+    private MockMvc mockMvc;
+
+    //-- Controller 의존 객체 SpyBean으로 생성
+    @SpyBean
+    private SubRecommendControllerHelper subRecommendControllerHelper;
+    @SpyBean
+    private SubRecommendServiceImpl subRecommendService;
+
+    //-- SubRecommendProviderImpl 생성을 위한 Mock Bean객체 생성
+    @MockBean
+    private SubRecommendProviderImpl subRecommendProvider;
+    @MockBean
+    private ISpendingRepository spendingRepository;
+    @MockBean
+    private ICategoryRepository categoryRepository;
+    @MockBean
+    private ISubRepository subRepository;
+
+    /*
+    @GetMapping("/category")
+     public ResponseEntity<CategoryInfoDTO> getRecommendCategory(@RequestParam String userId) {
+        CategoryInfoDTO categoryInfoDTO = subRecommendService.getRecommendCategoryBySpending(userId);
+        return ResponseEntity.ok(categoryInfoDTO);
+    }
+    */
+    @Test
+    @WithMockUser
+    void getRecommendCategory() throws Exception {
+        //--Given
+        String userId = "user01";
+
+        /*
+        public CategoryInfoDTO getRecommendCategoryBySpending(String userId) {
+            Map<String, Long> spendingByCategory = subRecommendProvider.getSpendingByCategory(userId);
+            ...
+
+            Category category = subRecommendProvider.getCategoryBySpendingCategory(maxSpendingCategory);
+            ...
+
+            return categoryInfoDTO;
+        }
+         */
+        Map<String, Long> spendingByCategory = new HashMap<>();
+        spendingByCategory.put("Life", 10000L);
+        spendingByCategory.put("Food", 20000L);
+
+        Category category = CommonTestUtils.createCategory();
+
+        given(subRecommendProvider.getSpendingByCategory(any())).willReturn(spendingByCategory);
+        given(subRecommendProvider.getCategoryBySpendingCategory(any())).willReturn(category);
+
+        //-- When, Then
+        mockMvc.perform(get("/api/subrecommend/category?userId="+userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.response.categoryId").exists())
+                .andExpect(jsonPath("$.response.categoryName").exists())
+                .andExpect(jsonPath("$.response.totalSpending").exists());
+
+    }
+
+    @Test
+    @WithMockUser
+    void getRecommendSubList() throws Exception {
+        //Given
+        /*
+        List<Sub> subList = subRecommendProvider.getSubListByCategoryId(categoryId);
+         */
+        List<Sub> subList = new ArrayList<>();
+        Sub sub = CommonTestUtils.createSub();
+        subList.add(sub);
+        given(subRecommendProvider.getSubListByCategoryId(any())).willReturn(subList);
+
+        //-- When, Then
+        mockMvc.perform(get("/api/subrecommend/list?categoryId=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.response[0].id").exists())
+                .andExpect(jsonPath("$.response[0].name").exists())
+                .andExpect(jsonPath("$.response[0].fee").exists());
+
+    }
+
+    @Test
+    @WithMockUser
+    void getSubDetail() throws Exception {
+        //-- Given
+        SubEntity subEntity = new SubEntity();
+        Sub sub = CommonTestUtils.createSub();
+        BeanUtils.copyProperties(sub, subEntity);
+        given(subRepository.findById(any())).willReturn(Optional.of(subEntity));
+
+        //--When, Then
+        mockMvc.perform(get("/api/subrecommend/detail/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.response.id").exists())
+                .andExpect(jsonPath("$.response.name").exists())
+                .andExpect(jsonPath("$.response.fee").exists());
+    }
+}
+
+
+// File: subrecommend/subrecommend-infra/src/test/java/com/subride/subrecommend/infra/in/web/CommonTestUtils.java
+package com.subride.subrecommend.infra.in.web;
+
+import com.subride.subrecommend.biz.domain.Category;
+import com.subride.subrecommend.biz.domain.Sub;
+
+public class CommonTestUtils {
+
+    public static Category createCategory() {
+        Category category = new Category();
+        category.setCategoryId("food");
+        category.setCategoryName("음식");
+        category.setSpendingCategory("Food");
+        return category;
+    }
+
+    public static Sub createSub() {
+        Category category = createCategory();
+
+        Sub sub = new Sub();
+        sub.setId(1L);
+        sub.setCategory(category);
+        sub.setName("넷플릭스");
+        sub.setDescription("온세상 미디어");
+        sub.setFee(15000L);
+        sub.setLogo("netflix.png");
+        sub.setMaxShareNum(5);
+
+        return sub;
+    }
+
+}
+
+
+// File: subrecommend/subrecommend-infra/src/main/resources/application-test.yml
+server:
+  port: ${SERVER_PORT:18081}
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:subrecommend-service}
+  datasource:
+    driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
+    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///subrecommend}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:P@ssw0rd$}
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: ${JPA_SHOW_SQL:false}
+    hibernate:
+      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
+    properties:
+      hibernate:
+        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
 jwt:
   secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
 
@@ -2532,6 +3019,29 @@ public class SubDTO {
     private int maxShareNum;
 }
 
+// File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/dto/CategorySpendingDTO.java
+package com.subride.subrecommend.infra.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
+@AllArgsConstructor
+public class CategorySpendingDTO {
+    private String category;
+    private Long amount;
+/*
+    public CategorySpendingDTO(@Value("#{target.category}") String category,
+                               @Value("#{target.amount}") Long amount) {
+        this.category = category;
+        this.amount = amount;
+    }
+
+ */
+}
+
+
 // File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/out/entity/SubEntity.java
 package com.subride.subrecommend.infra.out.entity;
 
@@ -2622,13 +3132,20 @@ public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    private String categoryId;
+    private String categoryName;
     private String spendingCategory;
+
+    public CategoryEntity(String categoryId, String categoryName, String spendingCategory) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.spendingCategory = spendingCategory;
+    }
 
     public Category toDomain() {
         Category category = new Category();
-        category.setId(id);
-        category.setName(name);
+        category.setCategoryId(categoryId);
+        category.setCategoryName(categoryName);
         category.setSpendingCategory(spendingCategory);
         return category;
     }
@@ -2646,6 +3163,7 @@ import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
 import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
 import com.subride.subrecommend.infra.out.repo.ISubRepository;
 import com.subride.subrecommend.biz.usecase.outport.ISubRecommendProvider;
+import com.subride.subrecommend.infra.dto.CategorySpendingDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -2662,7 +3180,9 @@ public class SubRecommendProviderImpl implements ISubRecommendProvider {
 
     @Override
     public Map<String, Long> getSpendingByCategory(String userId) {
-        return spendingRepository.getSpendingByCategory(userId);
+        return spendingRepository.getSpendingByCategory(userId)
+                .stream()
+                .collect(Collectors.toMap(CategorySpendingDTO::getCategory, CategorySpendingDTO::getAmount));
     }
 
     @Override
@@ -2673,7 +3193,7 @@ public class SubRecommendProviderImpl implements ISubRecommendProvider {
     }
 
     @Override
-    public List<Sub> getSubListByCategoryId(Long categoryId) {
+    public List<Sub> getSubListByCategoryId(String categoryId) {
         List<SubEntity> subEntities = subRepository.findByCategoryIdOrderByName(categoryId);
         return subEntities.stream()
                 .map(SubEntity::toDomain)
@@ -2691,21 +3211,30 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ICategoryRepository extends JpaRepository<CategoryEntity, Long> {
+    Optional<CategoryEntity> findByCategoryId(String categoryId);
     Optional<CategoryEntity> findBySpendingCategory(String spendingCategory);
 }
 
 // File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/out/repo/ISpendingRepository.java
 package com.subride.subrecommend.infra.out.repo;
 
+import com.subride.subrecommend.infra.dto.CategorySpendingDTO;
 import com.subride.subrecommend.infra.out.entity.SpendingEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Map;
+import java.util.List;
 
 public interface ISpendingRepository extends JpaRepository<SpendingEntity, Long> {
-    @Query("SELECT s.category, SUM(s.amount) FROM SpendingEntity s WHERE s.userId = :userId GROUP BY s.category")
-    Map<String, Long> getSpendingByCategory(String userId);
+    /*
+    JPQL(Java Persistence Query Language) 사용
+
+    쿼리 결과를 CategorySpendingDTO 객체로 매핑 하기 위해
+    CategorySpendingDTO에 @AllArgsConstructor로 생성자를 만들고,
+    JPQL에 'new' 키워드로 CategorySpendingDTO 객체가 생성되게 함
+    */
+    @Query("SELECT new com.subride.subrecommend.infra.dto.CategorySpendingDTO(s.category, SUM(s.amount)) FROM SpendingEntity s WHERE s.userId = :userId GROUP BY s.category")
+    List<CategorySpendingDTO> getSpendingByCategory(String userId);
 }
 
 // File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/out/repo/ISubRepository.java
@@ -2715,9 +3244,11 @@ import com.subride.subrecommend.infra.out.entity.SubEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ISubRepository extends JpaRepository<SubEntity, Long> {
-    List<SubEntity> findByCategoryIdOrderByName(Long categoryId);
+    List<SubEntity> findByCategoryIdOrderByName(String categoryId);
+    Optional<SubEntity> findByName(String name);
 }
 
 
@@ -2725,52 +3256,95 @@ public interface ISubRepository extends JpaRepository<SubEntity, Long> {
 // File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/in/web/SubRecommendController.java
 package com.subride.subrecommend.infra.in.web;
 
+import com.subride.common.dto.ResponseDTO;
+import com.subride.common.util.CommonUtils;
 import com.subride.subrecommend.biz.dto.CategoryInfoDTO;
 import com.subride.subrecommend.biz.dto.SubInfoDTO;
 import com.subride.subrecommend.biz.usecase.inport.ISubRecommendService;
+import com.subride.subrecommend.infra.exception.InfraException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "SubRecommend API", description = "구독추천 서비스 API")
 @Slf4j
 @RestController
+@SecurityRequirement(name = "bearerAuth")    //이 어노테이션이 없으면 요청 헤더에 Authorization헤더가 안 생김
 @RequestMapping("/api/subrecommend")
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class SubRecommendController {
     private final ISubRecommendService subRecommendService;
     private final SubRecommendControllerHelper subRecommendControllerHelper;
 
+    @Operation(summary = "사용자 소비에 맞는 구독 카테고리 구하기",
+            description = "최고 소비 카테고리와 매핑된 구독 카테고리의 Id, 이름, 소비액 총합을 리턴함")
+    @Parameters({
+      @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
+    })
     @GetMapping("/category")
-    public ResponseEntity<CategoryInfoDTO> getRecommendCategory(@RequestParam String userId) {
-        CategoryInfoDTO categoryInfoDTO = subRecommendService.getRecommendCategoryBySpending(userId);
-        return ResponseEntity.ok(categoryInfoDTO);
+    public ResponseEntity<ResponseDTO<CategoryInfoDTO>> getRecommendCategory(@RequestParam String userId) {
+        try {
+            CategoryInfoDTO categoryInfoDTO = subRecommendService.getRecommendCategoryBySpending(userId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "소비성향에 맞는 구독 카테고리 리턴", categoryInfoDTO));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
     }
 
+    @Operation(summary = "구독 서비스 리스트 리턴", description = "카테고리ID에 해당하는 구독서비스 정보 리턴")
+    @Parameters({
+        @Parameter(name = "categoryId", in = ParameterIn.QUERY, description = "카테고리ID", required = true)
+    })
     @GetMapping("/list")
-    public ResponseEntity<List<SubInfoDTO>> getRecommendSubList(@RequestParam Long categoryId) {
-        List<SubInfoDTO> subInfoDTOList = subRecommendService.getRecommendSubListByCategory(categoryId);
-        return ResponseEntity.ok(subInfoDTOList);
+    public ResponseEntity<ResponseDTO<List<SubInfoDTO>>> getRecommendSubList(@RequestParam String categoryId) {
+        try {
+            List<SubInfoDTO> subInfoDTOList = subRecommendService.getRecommendSubListByCategory(categoryId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독서비스 리턴", subInfoDTOList));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
     }
 
+    @Operation(summary = "구독상세 정보 리턴", description = "구독서비스ID에 해당하는 구독서비스 정보 리턴")
+    @Parameters({
+        @Parameter(name = "subId", in = ParameterIn.PATH, description = "구독서비스ID", required = true)
+    })
     @GetMapping("/detail/{subId}")
-    public ResponseEntity<SubInfoDTO> getSubDetail(@PathVariable Long subId) {
-        SubInfoDTO subInfoDTO = subRecommendControllerHelper.getSubDetail(subId);
-        return ResponseEntity.ok(subInfoDTO);
+    public ResponseEntity<ResponseDTO<SubInfoDTO>> getSubDetail(@PathVariable Long subId) {
+        try {
+            SubInfoDTO subInfoDTO = subRecommendControllerHelper.getSubDetail(subId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독상세 정보 리턴", subInfoDTO));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
+
     }
 }
 
 // File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/in/web/SubRecommendControllerHelper.java
 package com.subride.subrecommend.infra.in.web;
 
-import com.subride.subrecommend.biz.domain.Sub;
 import com.subride.subrecommend.biz.dto.SubInfoDTO;
 import com.subride.subrecommend.infra.out.entity.SubEntity;
 import com.subride.subrecommend.infra.out.repo.ISubRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -2778,6 +3352,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class SubRecommendControllerHelper {
     private final ISubRepository subRepository;
 
@@ -2812,6 +3387,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -2825,7 +3401,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         String token = resolveToken(request);
 
@@ -2855,7 +3433,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.subride.subrecommend.infra.exception.InfraException;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -2897,11 +3474,75 @@ public class JwtTokenProvider {
     public boolean validateToken(String token) {
         try {
             JWTVerifier verifier = JWT.require(algorithm).build();
-            DecodedJWT decodedJWT = verifier.verify(token);
+            verifier.verify(token);
             return true;
         } catch (JWTVerificationException e) {
             return false;
         }
+    }
+}
+
+// File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/common/util/TestDataGenerator.java
+package com.subride.subrecommend.infra.common.util;
+
+import com.subride.subrecommend.infra.out.entity.CategoryEntity;
+import com.subride.subrecommend.infra.out.entity.SpendingEntity;
+import com.subride.subrecommend.infra.out.entity.SubEntity;
+
+import java.util.*;
+
+public class TestDataGenerator {
+    public static List<CategoryEntity> generateCategoryEntities() {
+        CategoryEntity category1 = new CategoryEntity("life", "생필품", "Life");
+        CategoryEntity category2 = new CategoryEntity("pet", "반려동물", "Pet");
+        CategoryEntity category3 = new CategoryEntity("ott", "OTT", "OTT");
+        CategoryEntity category4 = new CategoryEntity("food", "Food", "Food");
+        CategoryEntity category5 = new CategoryEntity("health", "건강", "Health");
+        CategoryEntity category6 = new CategoryEntity("culture", "문화", "Culture");
+
+        return Arrays.asList(category1, category2, category3, category4, category5, category6);
+    }
+
+    public static List<SubEntity> generateSubEntities(List<CategoryEntity> categoryEntities) {
+        SubEntity sub1 = new SubEntity(1L, "런드리고", "빨래구독 서비스", categoryEntities.get(0), 35000L, 2, "laundrygo.png");
+        SubEntity sub2 = new SubEntity(2L, "술담화", "인생 전통술 구독 서비스", categoryEntities.get(3), 39000L, 3, "suldamhwa.jpeg");
+        SubEntity sub3 = new SubEntity(3L, "필리", "맞춤형 영양제 정기배송", categoryEntities.get(4), 15000L, 3, "pilly.png");
+        SubEntity sub4 = new SubEntity(4L, "넷플릭스", "넷플릭스", categoryEntities.get(2), 15000L, 5, "netflix.png");
+        SubEntity sub5 = new SubEntity(5L, "티빙", "티빙", categoryEntities.get(2), 15000L, 5, "tving.png");
+        SubEntity sub6 = new SubEntity(6L, "쿠팡플레이", "쿠팡플레이", categoryEntities.get(2), 15000L, 5, "coupang.png");
+        SubEntity sub7 = new SubEntity(7L, "디즈니플러스", "디즈니플러스", categoryEntities.get(2), 15000L, 5, "disney.png");
+        SubEntity sub8 = new SubEntity(8L, "해피문데이", "생리대 배송 서비스", categoryEntities.get(0), 6000L, 2, "happymoonday.jpeg");
+        SubEntity sub9 = new SubEntity(9L, "하비인더박스", "취미용 소품 송 서비스", categoryEntities.get(0), 29000L, 3, "hobbyinthebox.jpeg");
+        SubEntity sub10 = new SubEntity(10L, "월간가슴", "맞춤형 브라 배송", categoryEntities.get(0), 16000L, 2, "monthlychest.png");
+        SubEntity sub11 = new SubEntity(11L, "위클리셔츠", "깔끔하고 다양한 셔츠 3~5장 매주 배송", categoryEntities.get(0), 40000L, 2, "weeklyshirts.jpeg");
+        SubEntity sub12 = new SubEntity(12L, "월간과자", "매월 다른 구성의 과자상자 배송", categoryEntities.get(3), 9900L, 3, "monthlysnack.jpeg");
+        SubEntity sub13 = new SubEntity(13L, "밀리의서재", "전자책 무제한 구독", categoryEntities.get(5), 9900L, 5, "milibook.jpeg");
+        SubEntity sub14 = new SubEntity(14L, "더 반찬", "맛있고 다양한 집밥반찬 5세트", categoryEntities.get(3), 70000L, 3, "sidedishes.jpeg");
+        SubEntity sub15 = new SubEntity(15L, "와이즐리", "면도날 구독 서비스", categoryEntities.get(0), 8900L, 4, "wisely.jpeg");
+        SubEntity sub16 = new SubEntity(16L, "미하이 삭스", "매달 패션 양말 3종 배송", categoryEntities.get(0), 990L, 3, "mehi.jpeg");
+        SubEntity sub17 = new SubEntity(17L, "핀즐", "자취방 꾸미고 싶은 사람들을 위한 그림 구독 서비스", categoryEntities.get(0), 26000L, 3, "pinzle.png");
+        SubEntity sub18 = new SubEntity(18L, "꾸까", "2주마다 꽃 배달 서비스", categoryEntities.get(0), 30000L, 3, "kukka.png");
+        SubEntity sub19 = new SubEntity(19L, "커피 리브레", "매주 다른 종류의 커피 배달", categoryEntities.get(3), 48000L, 5, "coffeelibre.jpeg");
+
+        return Arrays.asList(sub1, sub2, sub3, sub4, sub5, sub6, sub7, sub8, sub9,
+                sub10, sub11, sub12, sub13, sub14, sub15, sub16, sub17, sub18, sub19);
+    }
+
+    public static List<SpendingEntity> generateSpendingEntities(String[] userIds, String[] categories) {
+        Random random = new Random();
+        List<SpendingEntity> spendingEntities = new ArrayList<>();
+
+        for (String userId : userIds) {
+            for (int i = 0; i < 50; i++) {
+                SpendingEntity spendingEntity = new SpendingEntity();
+                spendingEntity.setUserId(userId);
+                spendingEntity.setCategory(categories[random.nextInt(categories.length)]);
+                spendingEntity.setAmount(random.nextLong(1000, 100000));
+                spendingEntities.add(spendingEntity);
+            }
+        }
+
+        return spendingEntities;
     }
 }
 
@@ -2927,6 +3568,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@SuppressWarnings("unused")
 public class SecurityConfig {
     protected final JwtTokenProvider jwtTokenProvider;
 
@@ -2972,81 +3614,51 @@ public class SecurityConfig {
 // File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/common/config/DataInitializer.java
 package com.subride.subrecommend.infra.common.config;
 
+import com.subride.subrecommend.infra.common.util.TestDataGenerator;
 import com.subride.subrecommend.infra.out.entity.CategoryEntity;
+import com.subride.subrecommend.infra.out.entity.SpendingEntity;
 import com.subride.subrecommend.infra.out.entity.SubEntity;
 import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
+import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
 import com.subride.subrecommend.infra.out.repo.ISubRepository;
+import jakarta.annotation.PreDestroy;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
+@SuppressWarnings("unused")
 public class DataInitializer implements ApplicationRunner {
     private final ICategoryRepository categoryRepository;
     private final ISubRepository subRepository;
+    private final ISpendingRepository spendingRepository;
 
-    public DataInitializer(ICategoryRepository categoryRepository, ISubRepository subRepository) {
+    public DataInitializer(ICategoryRepository categoryRepository, ISubRepository subRepository, ISpendingRepository spendingRepository) {
         this.categoryRepository = categoryRepository;
         this.subRepository = subRepository;
+        this.spendingRepository = spendingRepository;
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        // 카테고리 데이터 입력
-        CategoryEntity category1 = new CategoryEntity(1L, "생필품", "Life");
-        CategoryEntity category2 = new CategoryEntity(2L, "반려동물", "Pet");
-        CategoryEntity category3 = new CategoryEntity(3L, "OTT", "OTT");
-        CategoryEntity category4 = new CategoryEntity(4L, "FOOD", "Food");
-        CategoryEntity category5 = new CategoryEntity(5L, "건강", "Health");
-        CategoryEntity category6 = new CategoryEntity(6L, "문화", "Culture");
+        List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
+        categoryRepository.saveAll(categories);
+        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
+        subRepository.saveAll(subs);
 
-        categoryRepository.save(category1);
-        categoryRepository.save(category2);
-        categoryRepository.save(category3);
-        categoryRepository.save(category4);
-        categoryRepository.save(category5);
-        categoryRepository.save(category6);
+        String[] userIds = {"user01", "user02", "user03", "user04", "user05"};
+        String[] categoryNames = categories.stream().map(CategoryEntity::getSpendingCategory).toArray(String[]::new);
+        List<SpendingEntity> spendings = TestDataGenerator.generateSpendingEntities(userIds, categoryNames);
+        spendingRepository.saveAll(spendings);
+    }
 
-        // 구독 서비스 데이터 입력
-        SubEntity sub1 = new SubEntity(1L, "런드리고", "빨래구독 서비스", category1, 35000L, 2, "laundrygo.png");
-        SubEntity sub2 = new SubEntity(2L, "술담화", "인생 전통술 구독 서비스", category4, 39000L, 3, "suldamhwa.jpeg");
-        SubEntity sub3 = new SubEntity(4L, "필리", "맞춤형 영양제 정기배송", category5, 15000L, 3, "pilly.png");
-        SubEntity sub4 = new SubEntity(5L, "넷플릭스", "넷플릭스", category3, 15000L, 5, "netflix.png");
-        SubEntity sub5 = new SubEntity(6L, "티빙", "티빙", category3, 15000L, 5, "tving.png");
-        SubEntity sub6 = new SubEntity(7L, "쿠팡플레이", "쿠팡플레이", category3, 15000L, 5, "coupang.png");
-        SubEntity sub7 = new SubEntity(8L, "디즈니플러스", "디즈니플러스", category3, 15000L, 5, "disney.png");
-        SubEntity sub8 = new SubEntity(9L, "해피문데이", "생리대 배송 서비스", category1, 6000L, 2, "happymoonday.jpeg");
-        SubEntity sub9 = new SubEntity(10L, "하비인더박스", "취미용 소품 송 서비스", category1, 29000L, 3, "hobbyinthebox.jpeg");
-        SubEntity sub10 = new SubEntity(11L, "월간가슴", "맞춤형 브라 배송", category1, 16000L, 2, "monthlychest.png");
-        SubEntity sub11 = new SubEntity(12L, "위클리셔츠", "깔끔하고 다양한 셔츠 3~5장 매주 배송", category1, 40000L, 2, "weeklyshirts.jpeg");
-        SubEntity sub12 = new SubEntity(13L, "월간과자", "매월 다른 구성의 과자상자 배송", category4, 9900L, 3, "monthlysnack.jpeg");
-        SubEntity sub13 = new SubEntity(14L, "밀리의서재", "전자책 무제한 구독", category6, 9900L, 5, "milibook.jpeg");
-        SubEntity sub14 = new SubEntity(15L, "더 반찬", "맛있고 다양한 집밥반찬 5세트", category4, 70000L, 3, "sidedishes.jpeg");
-        SubEntity sub15 = new SubEntity(16L, "와이즐리", "면도날 구독 서비스", category1, 8900L, 4, "wisely.jpeg");
-        SubEntity sub16 = new SubEntity(17L, "미하이 삭스", "매달 패션 양말 3종 배송", category1, 990L, 3, "mehi.jpeg");
-        SubEntity sub17 = new SubEntity(18L, "핀즐", "자취방 꾸미고 싶은 사람들을 위한 그림 구독 서비스", category1, 26000L, 3, "pinzle.png");
-        SubEntity sub18 = new SubEntity(19L, "꾸까", "2주마다 꽃 배달 서비스", category1, 30000L, 3, "kukka.png");
-        SubEntity sub19 = new SubEntity(20L, "커피 리브레", "매주 다른 종류의 커피 배달", category4, 48000L, 5, "coffeelibre.jpeg");
-
-        subRepository.save(sub1);
-        subRepository.save(sub2);
-        subRepository.save(sub3);
-        subRepository.save(sub4);
-        subRepository.save(sub5);
-        subRepository.save(sub6);
-        subRepository.save(sub7);
-        subRepository.save(sub8);
-        subRepository.save(sub9);
-        subRepository.save(sub10);
-        subRepository.save(sub11);
-        subRepository.save(sub12);
-        subRepository.save(sub13);
-        subRepository.save(sub14);
-        subRepository.save(sub15);
-        subRepository.save(sub16);
-        subRepository.save(sub17);
-        subRepository.save(sub18);
-        subRepository.save(sub19);
+    @PreDestroy
+    public void cleanData() {
+        spendingRepository.deleteAll();
+        subRepository.deleteAll();
+        categoryRepository.deleteAll();
     }
 }
 
@@ -3179,6 +3791,7 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT",
         scheme = "bearer"
 )
+@SuppressWarnings("unused")
 public class SpringDocConfig {
 
     @Bean
@@ -3195,6 +3808,10 @@ public class SpringDocConfig {
 // File: subrecommend/subrecommend-infra/src/main/java/com/subride/subrecommend/infra/exception/InfraException.java
 package com.subride.subrecommend.infra.exception;
 
+import lombok.Getter;
+
+@Getter
+@SuppressWarnings("unused")
 public class InfraException extends RuntimeException {
     private int code;
 
@@ -3215,7 +3832,6 @@ public class InfraException extends RuntimeException {
         this.code = code;
     }
 
-    public int getCode() { return code; }
 }
 
 
@@ -3249,8 +3865,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CategoryInfoDTO {
-    private Long categoryId;
+    private String categoryId;
     private String categoryName;
+    private String spendingCategory;
     private Long totalSpending;
 }
 
@@ -3263,7 +3880,7 @@ import java.util.List;
 
 public interface ISubRecommendService {
     CategoryInfoDTO getRecommendCategoryBySpending(String userId);
-    List<SubInfoDTO> getRecommendSubListByCategory(Long categoryId);
+    List<SubInfoDTO> getRecommendSubListByCategory(String categoryId);
 }
 
 // File: subrecommend/subrecommend-biz/src/main/java/com/subride/subrecommend/biz/usecase/outport/ISubRecommendProvider.java
@@ -3278,7 +3895,7 @@ import java.util.Map;
 public interface ISubRecommendProvider {
     Map<String, Long> getSpendingByCategory(String userId);
     Category getCategoryBySpendingCategory(String spendingCategory);
-    List<Sub> getSubListByCategoryId(Long categoryId);
+    List<Sub> getSubListByCategoryId(String categoryId);
 }
 
 
@@ -3315,15 +3932,16 @@ public class SubRecommendServiceImpl implements ISubRecommendService {
         Category category = subRecommendProvider.getCategoryBySpendingCategory(maxSpendingCategory);
 
         CategoryInfoDTO categoryInfoDTO = new CategoryInfoDTO();
-        categoryInfoDTO.setCategoryId(category.getId());
-        categoryInfoDTO.setCategoryName(category.getName());
+        categoryInfoDTO.setCategoryId(category.getCategoryId());
+        categoryInfoDTO.setCategoryName(category.getCategoryName());
+        categoryInfoDTO.setSpendingCategory(maxSpendingCategory);
         categoryInfoDTO.setTotalSpending(spendingByCategory.get(maxSpendingCategory));
 
         return categoryInfoDTO;
     }
 
     @Override
-    public List<SubInfoDTO> getRecommendSubListByCategory(Long categoryId) {
+    public List<SubInfoDTO> getRecommendSubListByCategory(String categoryId) {
         List<Sub> subList = subRecommendProvider.getSubListByCategoryId(categoryId);
 
         return subList.stream()
@@ -3353,8 +3971,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Category {
-    private Long id;
-    private String name;
+    private String categoryId;
+    private String categoryName;
     private String spendingCategory;
 }
 
@@ -3431,9 +4049,9 @@ allprojects {
 
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
-		implementation 'commons-beanutils:commons-beanutils:1.9.4'
 		implementation 'org.springframework.boot:spring-boot-starter-aop'
-		implementation 'com.google.code.gson:gson:2.11.0'
+		implementation 'com.google.code.gson:gson:2.11.0'				//Json처리
+		implementation 'org.apache.commons:commons-collections4:4.4'	//apache공통모듈(예:BeanUtils)
 		compileOnly 'org.projectlombok:lombok:1.18.12'
 		annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
@@ -3450,7 +4068,7 @@ allprojects {
 		testImplementation 'org.springframework.security:spring-security-test'
 
 		//-- For mysql System test
-		testImplementation 'org.testcontainers:mysql:1.17.3'
+		testImplementation 'org.testcontainers:mysql:1.19.8'
 
 		//-- For WebMvc System test
 		implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -3485,12 +4103,6 @@ subprojects {
 project(':common') {
 	bootJar.enabled = false
 	jar.enabled = true
-
-	dependencies {
-		implementation 'org.springframework.boot:spring-boot-starter-web'
-		implementation 'org.springframework.boot:spring-boot-starter-security'
-		implementation 'com.auth0:java-jwt:4.4.0'
-	}
 }
 
 configure(subprojects.findAll { it.name.endsWith('-infra') }) {

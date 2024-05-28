@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface ISubRecommendProvider {
+    List<Category> getAllCategories();
     Map<String, Long> getSpendingByCategory(String userId);
     Category getCategoryBySpendingCategory(String spendingCategory);
-    List<Sub> getSubListByCategoryId(Long categoryId);
+    List<Sub> getSubListByCategoryId(String categoryId);
 }

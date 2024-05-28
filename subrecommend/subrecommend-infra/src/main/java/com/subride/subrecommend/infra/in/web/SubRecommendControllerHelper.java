@@ -24,7 +24,9 @@ public class SubRecommendControllerHelper {
     public SubInfoDTO toSubInfoDTO(SubEntity sub) {
         SubInfoDTO subInfoDTO = new SubInfoDTO();
         subInfoDTO.setId(sub.getId());
+        subInfoDTO.setLogo(sub.getLogo());
         subInfoDTO.setName(sub.getName());
+        subInfoDTO.setCategoryName(sub.getCategory().getCategoryName());
         subInfoDTO.setDescription(sub.getDescription());
         subInfoDTO.setFee(sub.getFee());
         subInfoDTO.setMaxShareNum(sub.getMaxShareNum());

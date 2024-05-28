@@ -8,9 +8,10 @@ import lombok.Setter;
 public class Sub {
     private Long id;
     private String name;
+    private String logo;
     private String description;
     private Category category;
     private Long fee;
     private int maxShareNum;
-    private String logo;
+
 }
