@@ -1,4 +1,4 @@
-package com.subride.mysub.infra.dto;
+package com.subride.common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package com.subride.member.infra.in.web;
 
 import com.subride.common.dto.ResponseDTO;
-import com.subride.member.infra.dto.MemberInfoDTO;
+import com.subride.common.dto.MemberInfoDTO;
 import com.subride.member.infra.exception.InfraException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

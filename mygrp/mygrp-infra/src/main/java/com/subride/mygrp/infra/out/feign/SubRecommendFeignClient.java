@@ -1,4 +1,4 @@
-package com.subride.mysub.infra.out.feign;
+package com.subride.mygrp.infra.out.feign;
 
 import com.subride.common.dto.ResponseDTO;
 import com.subride.common.dto.SubInfoDTO;

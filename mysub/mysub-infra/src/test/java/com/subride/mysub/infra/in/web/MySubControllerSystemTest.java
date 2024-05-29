@@ -3,7 +3,7 @@ package com.subride.mysub.infra.in.web;
 
 import com.subride.common.dto.ResponseDTO;
 import com.subride.mysub.infra.common.util.TestDataGenerator;
-import com.subride.mysub.infra.dto.SubInfoDTO;
+import com.subride.common.dto.SubInfoDTO;
 import com.subride.mysub.infra.out.adapter.MySubProviderImpl;
 import com.subride.mysub.infra.out.entity.MySubEntity;
 import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;

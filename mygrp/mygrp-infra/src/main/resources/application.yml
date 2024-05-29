@@ -1,0 +1,43 @@
+server:
+  port: ${SERVER_PORT:18083}
+spring:
+  application:
+    name: ${SPRING_APPLICATION_NAME:mygrp-service}
+  datasource:
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/mygrp?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:P@ssw0rd$}
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: ${JPA_SHOW_SQL:false}
+    hibernate:
+      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
+    properties:
+      hibernate:
+        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+jwt:
+  secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    com.subride.mygrp.infra.in: DEBUG
+    com.subride.mygrp.infra.out: DEBUG
+    feign:
+      codec:
+        logger:
+          level: DEBUG
+feign:
+  member:
+    url: ${MEMBER_URI:http://localhost:18080}
+  subrecommend:
+    url: ${SUBRECOMMEND_URI:http://localhost:18081}
+  mysub:
+    url: ${MYSUB_URI:http://localhost:18082}

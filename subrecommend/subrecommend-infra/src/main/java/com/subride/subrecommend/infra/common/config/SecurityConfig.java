@@ -4,7 +4,6 @@ import com.subride.subrecommend.infra.common.jwt.JwtAuthenticationFilter;
 import com.subride.subrecommend.infra.common.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,7 +35,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs.yaml", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/subrecommend/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

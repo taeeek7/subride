@@ -2,7 +2,7 @@ package com.subride.member.infra.in.web;
 
 import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
-import com.subride.member.infra.dto.MemberInfoDTO;
+import com.subride.common.dto.MemberInfoDTO;
 import com.subride.member.infra.exception.InfraException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -47,7 +47,7 @@ public class MemberController {
     @Parameters({
             @Parameter(name = "userIds", in = ParameterIn.QUERY, description = "사용자ID(콤마로 구분)", required = true)
     })
-    public ResponseEntity<ResponseDTO<List<MemberInfoDTO>>> getUserInfoList(@RequestParam String userIds) {
+    public ResponseEntity<ResponseDTO<List<MemberInfoDTO>>> getMemberInfoList(@RequestParam String userIds) {
         List<String> userIdList = Arrays.asList(userIds.replaceAll("\\s", "").split(","));
 
         try {

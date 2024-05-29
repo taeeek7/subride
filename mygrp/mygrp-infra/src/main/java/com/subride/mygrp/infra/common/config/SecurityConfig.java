@@ -1,7 +1,7 @@
-package com.subride.mysub.infra.common.config;
+package com.subride.mygrp.infra.common.config;
 
-import com.subride.mysub.infra.common.jwt.JwtAuthenticationFilter;
-import com.subride.mysub.infra.common.jwt.JwtTokenProvider;
+import com.subride.mygrp.infra.common.jwt.JwtAuthenticationFilter;
+import com.subride.mygrp.infra.common.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

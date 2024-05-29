@@ -7,7 +7,6 @@ import com.subride.mysub.biz.dto.MySubDTO;
 import com.subride.mysub.biz.usecase.service.MySubServiceImpl;
 import com.subride.mysub.infra.common.config.SecurityConfig;
 import com.subride.mysub.infra.common.jwt.JwtTokenProvider;
-import com.subride.mysub.infra.dto.SubInfoDTO;
 import com.subride.mysub.infra.out.adapter.MySubProviderImpl;
 import com.subride.mysub.infra.out.entity.MySubEntity;
 import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;

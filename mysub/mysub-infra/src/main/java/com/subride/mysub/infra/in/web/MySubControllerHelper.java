@@ -1,9 +1,9 @@
 package com.subride.mysub.infra.in.web;
 
 import com.subride.common.dto.ResponseDTO;
+import com.subride.common.dto.SubInfoDTO;
 import com.subride.mysub.biz.dto.MySubDTO;
 import com.subride.mysub.infra.dto.MySubInfoDTO;
-import com.subride.mysub.infra.dto.SubInfoDTO;
 import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
