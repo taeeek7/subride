@@ -36,7 +36,7 @@ def merge_files(src_directories, output_file, extensions=['.java', '.yml', '.gra
                     print(f"Error reading {file_path}: {e}")
 
 if __name__ == "__main__":
-    default_directories = "common member subrecommend mysubgroup mysub transfer"
+    default_directories = "common member subrecommend mygroup mysub transfer"
     input_directories = input(f"# 소스 디렉토리명 (기본값: {default_directories}): ")
     
     if input_directories.strip() == "":

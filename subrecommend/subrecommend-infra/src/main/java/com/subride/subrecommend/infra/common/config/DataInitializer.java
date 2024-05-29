@@ -7,7 +7,6 @@ import com.subride.subrecommend.infra.out.entity.SubEntity;
 import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
 import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
 import com.subride.subrecommend.infra.out.repo.ISubRepository;
-import jakarta.annotation.PreDestroy;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -29,21 +28,25 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
-        categoryRepository.saveAll(categories);
-        List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
-        subRepository.saveAll(subs);
+        if (categoryRepository.count() == 0 && subRepository.count() == 0 && spendingRepository.count() == 0) {
+            List<CategoryEntity> categories = TestDataGenerator.generateCategoryEntities();
+            categoryRepository.saveAll(categories);
+            List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
+            subRepository.saveAll(subs);
 
-        String[] userIds = {"user01", "user02", "user03", "user04", "user05"};
-        String[] categoryNames = categories.stream().map(CategoryEntity::getSpendingCategory).toArray(String[]::new);
-        List<SpendingEntity> spendings = TestDataGenerator.generateSpendingEntities(userIds, categoryNames);
-        spendingRepository.saveAll(spendings);
+            String[] userIds = {"user01", "user02", "user03", "user04", "user05"};
+            String[] categoryNames = categories.stream().map(CategoryEntity::getSpendingCategory).toArray(String[]::new);
+            List<SpendingEntity> spendings = TestDataGenerator.generateSpendingEntities(userIds, categoryNames);
+            spendingRepository.saveAll(spendings);
+        }
     }
-
+/*
     @PreDestroy
     public void cleanData() {
         spendingRepository.deleteAll();
         subRepository.deleteAll();
         categoryRepository.deleteAll();
     }
+
+ */
 }

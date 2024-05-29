@@ -1,7 +1,20 @@
+/*
+Spring Boot 버전에 따라 사용하는 라이브러리의 버전을 맞춰줘야 함
+라이브러리 버전을 맞추지 않으면 실행 시 이상한 에러가 많이 발생함.
+이를 편하게 하기 위해 Spring Boot는 기본적으로 지원하는 라이브러리 목록을 갖고 있음
+이 목록에 있는 라이브러리는 버전을 명시하지 않으면 Spring Boot 버전에 맞는 버전을 로딩함
+
+Spring Boot 지원 라이브러리 목록 확인
+1) Spring Boot 공식 사이트 접속: spring.io
+2) Projects > Spring Boot 선택 > LEARN 탭 클릭
+3) 사용할 Spring Boot 버전의 'Reference Doc' 클릭
+4) 좌측 메뉴에서 보통 맨 마지막에 있는 'Dependency Versions' 클릭
+5) 사용할 라이브러리를 찾음. 만약 있으면 버전 명시 안해도 됨
+*/
+
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.1.11'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.springframework.boot' version '3.2.6'
 }
 
 allprojects {
@@ -12,11 +25,11 @@ allprojects {
 	apply plugin: 'io.spring.dependency-management'
 
 	/*
-	Gradle 8.7 부터 자바 버전 지정 방식 변경
-	이전 코드는 아래와 같이 Java 항목으로 감싸지 않았고 버전을 직접 지정했음
-	sourceCompatibility = '17'
-	targetCompatibility = '17'
-	*/
+    Gradle 8.7 부터 자바 버전 지정 방식 변경
+    이전 코드는 아래와 같이 Java 항목으로 감싸지 않았고 버전을 직접 지정했음
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+    */
 	java {
 		sourceCompatibility = JavaVersion.VERSION_17
 		targetCompatibility = JavaVersion.VERSION_17
@@ -29,25 +42,28 @@ allprojects {
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
 		implementation 'org.springframework.boot:spring-boot-starter-aop'
-		implementation 'com.google.code.gson:gson:2.11.0'				//Json처리
-		implementation 'org.apache.commons:commons-collections4:4.4'	//apache공통모듈(예:BeanUtils)
-		compileOnly 'org.projectlombok:lombok:1.18.12'
-		annotationProcessor 'org.projectlombok:lombok:1.18.24'
+		implementation 'com.google.code.gson:gson'               		//Json처리
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
 
-		//==============  For TEST
+		/*
+        TEST를 위한 설정
+        */
+		//=====================================================
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 		//--JUnit, Mokito Test
-		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-		testImplementation 'org.mockito:mockito-core:3.12.4'
-		testImplementation 'org.mockito:mockito-junit-jupiter:3.12.4'
+		testImplementation 'org.junit.jupiter:junit-jupiter-api'
+		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+		testImplementation 'org.mockito:mockito-core'
+		testImplementation 'org.mockito:mockito-junit-jupiter'
 
 		//-- spring security test
 		testImplementation 'org.springframework.security:spring-security-test'
 
 		//-- For mysql System test
-		testImplementation 'org.testcontainers:mysql:1.19.8'
+		testImplementation 'org.testcontainers:mysql'
 
 		//-- For WebMvc System test
 		implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -55,8 +71,8 @@ allprojects {
 		//-- lombok
 		// -- @SpringBootTest를 사용하여 전체 애플리케이션 컨텍스트를 로딩되는 테스트 코드에만 사용
 		// -- 그 외 단위나 컴포넌트 테스트에 사용하면 제대로 동작안함
-		testCompileOnly 'org.projectlombok:lombok:1.18.12'
-		testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+		testCompileOnly 'org.projectlombok:lombok'
+		testAnnotationProcessor 'org.projectlombok:lombok'
 		//=============================================
 	}
 
@@ -70,7 +86,7 @@ allprojects {
 	}
 	test {
 		useJUnitPlatform()
-		include '**/*Test.class'
+		include '**/*Test.class'		//--클래스 이름이 Test로 끝나는 것만 포함함
 	}
 	//==========================
 }
@@ -88,10 +104,11 @@ configure(subprojects.findAll { it.name.endsWith('-infra') }) {
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
+		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'	//For swagger
+
 		runtimeOnly 'com.mysql:mysql-connector-j'
 		implementation 'org.springframework.boot:spring-boot-starter-security'
-		implementation 'com.auth0:java-jwt:4.4.0'
+		implementation 'com.auth0:java-jwt:4.4.0'			//JWT unitlity
 	}
 }
 

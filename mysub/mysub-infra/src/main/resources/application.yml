@@ -1,11 +1,11 @@
 server:
-  port: ${SERVER_PORT:18081}
+  port: ${SERVER_PORT:18082}
 spring:
   application:
-    name: ${SPRING_APPLICATION_NAME:subrecommend-service}
+    name: ${SPRING_APPLICATION_NAME:mysub-service}
   datasource:
-    driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
-    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///subrecommend}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/mysub?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:P@ssw0rd$}
   jpa:
@@ -17,6 +17,9 @@ spring:
     properties:
       hibernate:
         format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
 jwt:
   secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
 
@@ -25,5 +28,13 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
-    com.subride.subrecommend.infra.in: DEBUG
-    com.subride.subrecommend.infra.out: DEBUG
+    com.subride.mysub.infra.in: DEBUG
+    com.subride.mysub.infra.out: DEBUG
+    feign:
+      codec:
+        logger:
+          level: DEBUG
+feign:
+  subrecommend:
+    url: ${SUBRECOMMEND_URI:http://localhost:18081}
+

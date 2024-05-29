@@ -4,3 +4,6 @@ include 'member:member-biz'
 include 'member:member-infra'
 include 'subrecommend:subrecommend-infra'
 include 'subrecommend:subrecommend-biz'
+include 'mysub:mysub-infra'
+include 'mysub:mysub-biz'
+

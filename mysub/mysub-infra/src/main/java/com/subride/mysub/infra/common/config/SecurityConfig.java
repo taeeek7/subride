@@ -1,10 +1,9 @@
-package com.subride.subrecommend.infra.common.config;
+package com.subride.mysub.infra.common.config;
 
-import com.subride.subrecommend.infra.common.jwt.JwtAuthenticationFilter;
-import com.subride.subrecommend.infra.common.jwt.JwtTokenProvider;
+import com.subride.mysub.infra.common.jwt.JwtAuthenticationFilter;
+import com.subride.mysub.infra.common.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,7 +35,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs.yaml", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/subrecommend/**").permitAll()
+                        //.requestMatchers(HttpMethod.POST, "/api/my-subs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -50,8 +49,7 @@ public class SecurityConfig {
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000",
-                    "http://localhost:18082"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

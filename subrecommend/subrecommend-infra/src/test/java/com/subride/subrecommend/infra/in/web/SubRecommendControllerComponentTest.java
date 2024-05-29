@@ -6,12 +6,12 @@ import com.subride.subrecommend.biz.usecase.service.SubRecommendServiceImpl;
 import com.subride.subrecommend.infra.common.config.SecurityConfig;
 import com.subride.subrecommend.infra.common.jwt.JwtTokenProvider;
 import com.subride.subrecommend.infra.out.adapter.SubRecommendProviderImpl;
+import com.subride.subrecommend.infra.out.entity.CategoryEntity;
 import com.subride.subrecommend.infra.out.entity.SubEntity;
 import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
 import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
 import com.subride.subrecommend.infra.out.repo.ISubRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -140,9 +140,16 @@ public class SubRecommendControllerComponentTest {
     @WithMockUser
     void getSubDetail() throws Exception {
         //-- Given
+        CategoryEntity category = new CategoryEntity();
         SubEntity subEntity = new SubEntity();
         Sub sub = CommonTestUtils.createSub();
-        BeanUtils.copyProperties(sub, subEntity);
+        subEntity.setId(sub.getId());
+        subEntity.setName(sub.getName());
+        subEntity.setFee(sub.getFee());
+        subEntity.setLogo(sub.getLogo());
+        subEntity.setDescription(sub.getDescription());
+        subEntity.setCategory(category);
+        subEntity.setMaxShareNum(sub.getMaxShareNum());
         given(subRepository.findById(any())).willReturn(Optional.of(subEntity));
 
         //--When, Then

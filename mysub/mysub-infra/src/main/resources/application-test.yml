@@ -1,11 +1,11 @@
 server:
-  port: ${SERVER_PORT:18081}
+  port: ${SERVER_PORT:18082}
 spring:
   application:
-    name: ${SPRING_APPLICATION_NAME:subrecommend-service}
+    name: ${SPRING_APPLICATION_NAME:mysub-service}
   datasource:
     driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
-    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///subrecommend}
+    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///mysub}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:P@ssw0rd$}
   jpa:
@@ -24,6 +24,7 @@ jwt:
 logging:
   level:
     root: INFO
-    org.springframework.security: DEBUG
-    com.subride.subrecommend.infra.in: DEBUG
-    com.subride.subrecommend.infra.out: DEBUG
+feign:
+  subrecommend:
+    url: ${SUBRECOMMEND_URI:http://localhost:18081}
+
