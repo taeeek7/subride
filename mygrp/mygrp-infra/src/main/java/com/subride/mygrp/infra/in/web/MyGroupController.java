@@ -102,7 +102,7 @@ public class MyGroupController {
                 .build());
     }
 
-    @Operation(summary = "총 월 절감 가능액 리턴", description = "썹그룹 참여롤 통해 절약할 수 있는 최대액을 계산합니다")
+    @Operation(summary = "총 월 절감 가능액 리턴", description = "썹그룹 참여롤 통해 절약할 수 있는 최대액을 계산합니다.")
     @Parameters({
             @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
     })
