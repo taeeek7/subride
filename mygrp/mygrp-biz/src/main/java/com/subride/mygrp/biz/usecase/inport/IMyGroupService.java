@@ -1,18 +1,15 @@
 package com.subride.mygrp.biz.usecase.inport;
 
-import com.subride.mygrp.biz.dto.MyGroupCreateDTO;
-import com.subride.mygrp.biz.dto.MyGroupDetailDTO;
-import com.subride.mygrp.biz.dto.MyGroupJoinDTO;
-import com.subride.mygrp.biz.dto.MyGroupSummaryDTO;
+import com.subride.mygrp.biz.domain.Group;
+import com.subride.mygrp.biz.dto.GroupCreateDTO;
+import com.subride.mygrp.biz.dto.GroupJoinDTO;
 
 import java.util.List;
 
 public interface IMyGroupService {
-    List<MyGroupSummaryDTO> getMyGroupSummaryList(String userId);
-    MyGroupDetailDTO getMyGroupDetail(Long myGroupId);
-    void createMyGroup(MyGroupCreateDTO myGroupCreateDTO);
-    void joinMyGroup(MyGroupJoinDTO myGroupJoinDTO);
+    List<Group> getMyGroupSummaryList(String userId);
+    Group getMyGroupDetail(Long myGroupId, String userId);
+    void createMyGroup(GroupCreateDTO groupCreateDTO);
+    void joinMyGroup(GroupJoinDTO groupJoinDTO);
     void leaveMyGroup(Long myGroupId, String userId);
-    Long getTotalSubscriptionAmount(String userId);
-    Long getMaxDiscountAmount(String userId);
 }

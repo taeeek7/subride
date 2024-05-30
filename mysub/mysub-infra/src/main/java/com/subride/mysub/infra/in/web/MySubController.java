@@ -1,9 +1,10 @@
 package com.subride.mysub.infra.in.web;
 
+import com.subride.common.dto.MySubInfoDTO;
 import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
 import com.subride.mysub.biz.usecase.inport.IMySubService;
-import com.subride.mysub.infra.dto.MySubInfoDTO;
+import com.subride.mysub.infra.exception.InfraException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,8 +34,14 @@ public class MySubController {
     })
     @GetMapping
     public ResponseEntity<ResponseDTO<List<MySubInfoDTO>>> getMySubList(@RequestParam String userId) {
-        List<MySubInfoDTO> mySubInfoDTOList = mySubControllerHelper.toMySubInfoDTOList(mySubService.getMySubList(userId));
-        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 목록 조회 성공", mySubInfoDTOList));
+        try {
+            List<MySubInfoDTO> mySubInfoDTOList = mySubControllerHelper.toMySubInfoDTOList(mySubService.getMySubList(userId));
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 목록 조회 성공", mySubInfoDTOList));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
     }
 
     @Operation(summary = "구독 취소", description = "구독서비스를 삭제합니다.")
@@ -43,8 +51,14 @@ public class MySubController {
     })
     @DeleteMapping("/{subId}")
     public ResponseEntity<ResponseDTO<Void>> cancelSub(@PathVariable Long subId, @RequestParam String userId) {
-        mySubService.cancelSub(subId, userId);
-        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 취소 성공", null));
+        try {
+            mySubService.cancelSub(subId, userId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 취소 성공", null));
+        }  catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
     }
 
     @Operation(summary = "구독 등록", description = "구독서비스를 등록합니다.")
@@ -54,8 +68,14 @@ public class MySubController {
     })
     @PostMapping("/{subId}")
     public ResponseEntity<ResponseDTO<Void>> subscribeSub(@PathVariable Long subId, @RequestParam String userId) {
-        mySubService.subscribeSub(subId, userId);
-        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 추가 성공", null));
+        try {
+            mySubService.subscribeSub(subId, userId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 추가 성공", null));
+        }  catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
     }
 
     @Operation(summary = "구독여부 리턴", description = "사용자가 구독서비스를 가입했는지 여부를 리턴")
@@ -67,7 +87,13 @@ public class MySubController {
     public ResponseEntity<ResponseDTO<Boolean>> checkSubscription(
             @RequestParam String userId,
             @RequestParam Long subId) {
-        boolean isSubscribed = mySubService.checkSubscription(userId, subId);
-        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 여부 확인 성공", isSubscribed));
+        try {
+            boolean isSubscribed = mySubService.checkSubscription(userId, subId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 여부 확인 성공", isSubscribed));
+        }  catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
     }
 }

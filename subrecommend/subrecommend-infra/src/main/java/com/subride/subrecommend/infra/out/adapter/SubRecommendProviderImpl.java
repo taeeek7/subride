@@ -53,4 +53,12 @@ public class SubRecommendProviderImpl implements ISubRecommendProvider {
                 .map(SubEntity::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Sub> getSubListByIds(List<Long> subIds) {
+        List<SubEntity> subEntities = subRepository.findAllById(subIds);
+        return subEntities.stream()
+                .map(SubEntity::toDomain)
+                .collect(Collectors.toList());
+    }
 }

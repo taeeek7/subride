@@ -4,11 +4,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MyGroupCreateDTO {
-    private String myGroupName;
+public class GroupCreateDTO {
+    private String groupName;
     private Long subId;
     private String leaderId;
     private String bankName;
     private String bankAccount;
     private int paymentDay;
+    private int maxShareNum;
 }

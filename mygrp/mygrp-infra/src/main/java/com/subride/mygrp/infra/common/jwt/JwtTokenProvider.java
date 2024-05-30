@@ -41,7 +41,7 @@ public class JwtTokenProvider {
 
             return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
         } catch (Exception e) {
-            throw new InfraException(0, "Invalid refresh token");
+            throw new InfraException(0, "Invalid refresh token", e);
         }
     }
 

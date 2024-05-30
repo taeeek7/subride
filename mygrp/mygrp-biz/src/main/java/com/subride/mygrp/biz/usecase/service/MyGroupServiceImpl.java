@@ -1,94 +1,58 @@
 package com.subride.mygrp.biz.usecase.service;
 
-import com.subride.mygrp.biz.domain.MyGroup;
-import com.subride.mygrp.biz.dto.MyGroupCreateDTO;
-import com.subride.mygrp.biz.dto.MyGroupDetailDTO;
-import com.subride.mygrp.biz.dto.MyGroupJoinDTO;
-import com.subride.mygrp.biz.dto.MyGroupSummaryDTO;
-import com.subride.mygrp.biz.exception.BizException;
+import com.subride.mygrp.biz.domain.Group;
+import com.subride.mygrp.biz.dto.GroupCreateDTO;
+import com.subride.mygrp.biz.dto.GroupJoinDTO;
 import com.subride.mygrp.biz.usecase.inport.IMyGroupService;
 import com.subride.mygrp.biz.usecase.outport.IMyGroupProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MyGroupServiceImpl implements IMyGroupService {
     private final IMyGroupProvider myGroupProvider;
+    private final RandomValueGenerator randomValueGenerator;
 
     @Override
-    public List<MyGroupSummaryDTO> getMyGroupSummaryList(String userId) {
-        List<MyGroup> myGroupList = myGroupProvider.getMyGroupListByUserId(userId);
-        return myGroupList.stream()
-                .map(this::toMyGroupSummaryDTO)
-                .collect(Collectors.toList());
+    public List<Group> getMyGroupSummaryList(String userId) {
+        List<Group> myGroupList = myGroupProvider.getMyGroupListByUserId(userId);
+        return myGroupList;
     }
 
     @Override
-    public MyGroupDetailDTO getMyGroupDetail(Long myGroupId) {
-        MyGroup myGroup = myGroupProvider.getMyGroupByMyGroupId(myGroupId);
-        return toMyGroupDetailDTO(myGroup);
+    public Group getMyGroupDetail(Long myGroupId, String userId) {
+        return myGroupProvider.getMyGroupByGroupId(myGroupId, userId);
     }
 
     @Override
-    public void createMyGroup(MyGroupCreateDTO myGroupCreateDTO) {
-        MyGroup myGroup = toMyGroup(myGroupCreateDTO);
-        myGroupProvider.saveMyGroup(myGroup);
+    public void createMyGroup(GroupCreateDTO groupCreateDTO) {
+        Group myGroup = new Group();
+        myGroup.setGroupName(groupCreateDTO.getGroupName());
+        myGroup.setSubId(groupCreateDTO.getSubId());
+        myGroup.setLeaderId(groupCreateDTO.getLeaderId());
+        myGroup.setMemberIds(Collections.singleton(groupCreateDTO.getLeaderId()));
+        myGroup.setBankName(groupCreateDTO.getBankName());
+        myGroup.setBankAccount(groupCreateDTO.getBankAccount());
+        myGroup.setPaymentDay(groupCreateDTO.getPaymentDay());
+        myGroup.setInviteCode(randomValueGenerator.generateUniqueRandomValue());
+        myGroup.setMaxShareNum(groupCreateDTO.getMaxShareNum());
+
+        myGroupProvider.createMyGroup(myGroup);
     }
 
     @Override
-    public void joinMyGroup(MyGroupJoinDTO myGroupJoinDTO) {
-        MyGroup myGroup = myGroupProvider.getMyGroupByInviteCode(myGroupJoinDTO.getInviteCode());
-
-        if (myGroup.getMemberIds().size() >= myGroup.getMaxMemberCount()) {
-            throw new BizException("The group is already full.");
-        }
-
-        myGroup.getMemberIds().add(myGroupJoinDTO.getUserId());
-        myGroupProvider.saveMyGroup(myGroup);
-
-        // 사용자가 그룹의 구독서비스에 가입되어 있지 않으면 구독서비스 가입 처리
-        if (!myGroupProvider.isSubscribed(myGroupJoinDTO.getUserId(), myGroup.getSubId())) {
-            myGroupProvider.subscribeSub(myGroup.getSubId(), myGroupJoinDTO.getUserId());
-        }
+    public void joinMyGroup(GroupJoinDTO groupJoinDTO) {
+        myGroupProvider.joinMyGroup(groupJoinDTO);
     }
 
     @Override
     public void leaveMyGroup(Long myGroupId, String userId) {
-        if (!myGroupProvider.existsByMyGroupIdAndUserId(myGroupId, userId)) {
-            throw new BizException("You are not a member of this group.");
-        }
-        myGroupProvider.deleteMyGroupUser(myGroupId, userId);
-    }
-
-    @Override
-    public Long getTotalSubscriptionAmount(String userId) {
-        return myGroupProvider.calculateTotalSubscriptionAmount(userId);
-    }
-
-    @Override
-    public Long getMaxDiscountAmount(String userId) {
-        return myGroupProvider.calculateMaxDiscountAmount(userId);
-    }
-
-    private MyGroupSummaryDTO toMyGroupSummaryDTO(MyGroup myGroup) {
-        // ... mapping logic ...
-        MyGroupSummaryDTO myGroupSummaryDTO = new MyGroupSummaryDTO();
-        return myGroupSummaryDTO;
-    }
-
-    private MyGroupDetailDTO toMyGroupDetailDTO(MyGroup myGroup) {
-        // ... mapping logic ...
-        MyGroupDetailDTO myGroupDetailDTO = new MyGroupDetailDTO();
-        return myGroupDetailDTO;
-    }
-
-    private MyGroup toMyGroup(MyGroupCreateDTO myGroupCreateDTO) {
-        // ... mapping logic ...
-        MyGroup myGroup = new MyGroup();
-        return myGroup;
+        myGroupProvider.leaveMyGroup(myGroupId, userId);
     }
 }

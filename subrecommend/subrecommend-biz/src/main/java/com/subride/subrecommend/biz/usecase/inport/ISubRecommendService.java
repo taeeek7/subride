@@ -8,4 +8,6 @@ public interface ISubRecommendService {
     List<CategoryInfoDTO> getAllCategories();
     CategoryInfoDTO getRecommendCategoryBySpending(String userId);
     List<SubInfoDTO> getRecommendSubListByCategory(String categoryId);
+
+    List<SubInfoDTO> getSubInfoListByIds(List<Long> subIds);
 }

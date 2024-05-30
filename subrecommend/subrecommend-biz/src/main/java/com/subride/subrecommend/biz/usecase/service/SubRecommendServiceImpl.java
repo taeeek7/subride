@@ -63,6 +63,14 @@ public class SubRecommendServiceImpl implements ISubRecommendService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<SubInfoDTO> getSubInfoListByIds(List<Long> subIds) {
+        List<Sub> subList = subRecommendProvider.getSubListByIds(subIds);
+        return subList.stream()
+                .map(this::toSubInfoDTO)
+                .collect(Collectors.toList());
+    }
+
     private SubInfoDTO toSubInfoDTO(Sub sub) {
         SubInfoDTO subInfoDTO = new SubInfoDTO();
         subInfoDTO.setId(sub.getId());

@@ -11,4 +11,5 @@ public interface ISubRecommendProvider {
     Map<String, Long> getSpendingByCategory(String userId);
     Category getCategoryBySpendingCategory(String spendingCategory);
     List<Sub> getSubListByCategoryId(String categoryId);
+    List<Sub> getSubListByIds(List<Long> subIds);
 }

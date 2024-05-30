@@ -4,7 +4,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MyGroupJoinDTO {
+public class GroupJoinDTO {
     private String inviteCode;
     private String userId;
 }

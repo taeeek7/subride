@@ -1,18 +1,14 @@
 package com.subride.mygrp.biz.usecase.outport;
 
-import com.subride.mygrp.biz.domain.MyGroup;
+import com.subride.mygrp.biz.domain.Group;
+import com.subride.mygrp.biz.dto.GroupJoinDTO;
 
 import java.util.List;
 
 public interface IMyGroupProvider {
-    MyGroup getMyGroupByMyGroupId(Long myGroupId);
-    MyGroup getMyGroupByInviteCode(String invideCode);
-    List<MyGroup> getMyGroupListByUserId(String userId);
-    boolean existsByMyGroupIdAndUserId(Long myGroupId, String userId);
-    void saveMyGroup(MyGroup myGroup);
-    void deleteMyGroupUser(Long myGroupId, String userId);
-    Long calculateTotalSubscriptionAmount(String userId);
-    Long calculateMaxDiscountAmount(String userId);
-    boolean isSubscribed(String userId, Long subId);
-    boolean subscribeSub(Long subId, String userId);
+    Group getMyGroupByGroupId(Long groupId, String userId);
+    List<Group> getMyGroupListByUserId(String userId);
+    void createMyGroup(Group group);
+    void joinMyGroup(GroupJoinDTO groupJoinDTO);
+    void leaveMyGroup(Long groupId, String userId);
 }

@@ -92,4 +92,14 @@ public class SubRecommendController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
         }
     }
+
+    @Operation(summary = "구독 ID 리스트로 구독 정보 조회", description = "구독 ID 리스트를 받아 구독 정보를 조회합니다.")
+    @Parameters({
+            @Parameter(name = "subIds", in = ParameterIn.QUERY, description = "구독 ID 리스트 (쉼표로 구분)", required = true)
+    })
+    @GetMapping("/list-by-ids")
+    public ResponseEntity<ResponseDTO<List<SubInfoDTO>>> getSubInfoListByIds(@RequestParam List<Long> subIds) {
+        List<SubInfoDTO> subInfoDTOList = subRecommendService.getSubInfoListByIds(subIds);
+        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 정보 조회 성공", subInfoDTOList));
+    }
 }
