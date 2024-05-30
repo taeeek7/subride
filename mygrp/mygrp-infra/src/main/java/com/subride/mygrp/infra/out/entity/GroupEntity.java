@@ -26,8 +26,6 @@ public class GroupEntity {
     @Column(name = "member_id")
     private Set<String> memberIds;
 
-    private int maxShareNum;
-
     private String bankName;
     private String bankAccount;
     private int paymentDay;
@@ -44,7 +42,6 @@ public class GroupEntity {
         group.setBankAccount(bankAccount);
         group.setPaymentDay(paymentDay);
         group.setInviteCode(inviteCode);
-        group.setMaxShareNum(maxShareNum);
         return group;
     }
 
@@ -59,7 +56,6 @@ public class GroupEntity {
                 .bankAccount(group.getBankAccount())
                 .paymentDay(group.getPaymentDay())
                 .inviteCode(group.getInviteCode())
-                .maxShareNum(group.getMaxShareNum())
                 .build();
     }
 }

@@ -1,4 +1,4 @@
-package com.subride.mygrp.biz.dto;
+package com.subride.common.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,10 +8,10 @@ import lombok.Setter;
 public class GroupSummaryDTO {
     private Long groupId;
     private String groupName;
+    private Long subId;
     private String subName;
     private String logo;
     private int paymentDay;
     private Long fee;
-    private Long payedFee;
-    private Long discountedFee;
+    private int memberCount;
 }

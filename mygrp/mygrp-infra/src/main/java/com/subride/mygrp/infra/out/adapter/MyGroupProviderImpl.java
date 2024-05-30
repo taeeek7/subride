@@ -13,12 +13,14 @@ import com.subride.mygrp.infra.out.feign.MySubFeignClient;
 import com.subride.mygrp.infra.out.feign.SubRecommendFeignClient;
 import com.subride.mygrp.infra.out.repo.IMyGroupRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class MyGroupProviderImpl implements IMyGroupProvider {
@@ -28,7 +30,7 @@ public class MyGroupProviderImpl implements IMyGroupProvider {
     private final MemberFeignClient memberFeignClient;
 
     @Override
-    public Group getMyGroupByGroupId(Long groupId, String userId) {
+    public Group getMyGroupByGroupId(Long groupId) {
         GroupEntity groupEntity = myGroupRepository.findById(groupId)
                 .orElseThrow(() -> new InfraException(0, "My group not found", new Exception("Can't find group with "+groupId)));
 
@@ -37,7 +39,7 @@ public class MyGroupProviderImpl implements IMyGroupProvider {
         SubInfoDTO subInfoDTO = responseSub.getResponse();
 
         // 그룹 엔티티와 구독 정보를 매핑하여 Group 도메인 객체 생성
-        Group group = toGroup(groupEntity, subInfoDTO, userId);
+        Group group = toGroup(groupEntity, subInfoDTO);
 
         // MemberFeignClient를 사용하여 사용자 정보 조회
         String userIds = String.join(",", groupEntity.getMemberIds());
@@ -69,18 +71,19 @@ public class MyGroupProviderImpl implements IMyGroupProvider {
                             .findFirst()
                             .orElse(null);
 
-                    return toGroup(groupEntity, subInfoDTO, userId);
+                    return toGroup(groupEntity, subInfoDTO);
                 })
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void createMyGroup(Group myGroup) {
+    public String createMyGroup(Group myGroup) {
         if(myGroupRepository.existsByGroupNameAndSubId(myGroup.getGroupName(), myGroup.getSubId())) {
             throw new InfraException(0, "이미 등록된 그룹입니다.");
         }
         GroupEntity groupEntity = GroupEntity.fromDomain(myGroup);
         myGroupRepository.save(groupEntity);
+        return groupEntity.getInviteCode();
     }
 
     @Override
@@ -93,10 +96,6 @@ public class MyGroupProviderImpl implements IMyGroupProvider {
 
         if (groupEntity.getMemberIds().contains(groupJoinDTO.getUserId())) {
             throw new InfraException(0, "이미 썹그룹에 참석하였습니다.");
-        }
-
-        if (groupEntity.getMemberIds().size() >= groupEntity.getMaxShareNum()) {
-            throw new InfraException(0, "이미 멤버 구성이 완료되었습니다.");
         }
 
         groupEntity.getMemberIds().add(groupJoinDTO.getUserId());
@@ -127,20 +126,19 @@ public class MyGroupProviderImpl implements IMyGroupProvider {
         myGroupRepository.save(groupEntity);
     }
 
-    private Group toGroup(GroupEntity groupEntity, SubInfoDTO subInfoDTO, String userId) {
+    private Group toGroup(GroupEntity groupEntity, SubInfoDTO subInfoDTO) {
         Group group = groupEntity.toDomain();
 
         if (subInfoDTO != null) {
+            //log.info("**** id and name: {}, {}", subInfoDTO.getSubId(), subInfoDTO.getSubName());
+
+            group.setSubId(subInfoDTO.getSubId());
             group.setSubName(subInfoDTO.getSubName());
             group.setLogo(subInfoDTO.getLogo());
             group.setFee(subInfoDTO.getFee());
             group.setMaxShareNum(subInfoDTO.getMaxShareNum());
         }
 
-        if(userId != null) {    //userId값이 있으면 실제 구독료와 최대 절감액을 계산함
-            group.calulatePayedFee(userId);
-            group.calulateDiscountedFee(userId);
-        }
         return group;
     }
 }

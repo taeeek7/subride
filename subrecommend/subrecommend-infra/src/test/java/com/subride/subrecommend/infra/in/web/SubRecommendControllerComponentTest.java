@@ -8,6 +8,7 @@ import com.subride.subrecommend.infra.common.jwt.JwtTokenProvider;
 import com.subride.subrecommend.infra.out.adapter.SubRecommendProviderImpl;
 import com.subride.subrecommend.infra.out.entity.CategoryEntity;
 import com.subride.subrecommend.infra.out.entity.SubEntity;
+import com.subride.subrecommend.infra.out.feign.MySubFeignClient;
 import com.subride.subrecommend.infra.out.repo.ICategoryRepository;
 import com.subride.subrecommend.infra.out.repo.ISpendingRepository;
 import com.subride.subrecommend.infra.out.repo.ISubRepository;
@@ -60,7 +61,8 @@ public class SubRecommendControllerComponentTest {
     private SubRecommendControllerHelper subRecommendControllerHelper;
     @SpyBean
     private SubRecommendServiceImpl subRecommendService;
-
+    @MockBean
+    private MySubFeignClient mySubFeignClient;
     //-- SubRecommendProviderImpl 생성을 위한 Mock Bean객체 생성
     @MockBean
     private SubRecommendProviderImpl subRecommendProvider;

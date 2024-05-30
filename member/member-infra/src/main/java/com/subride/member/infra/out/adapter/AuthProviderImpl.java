@@ -32,9 +32,9 @@ public class AuthProviderImpl implements IAuthProvider {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(userId, password));
         } catch (BadCredentialsException e) {
-            throw new InfraException("ID/PW 검증 실패", e);
+            throw new InfraException(0, "ID/PW 검증 실패", e);
         } catch (Exception e) {
-            throw new InfraException("ID/PW 검증 실패", e);
+            throw new InfraException(0, "ID/PW 검증 실패", e);
         }
 
         Optional<MemberEntity> optionalPersistentMember = memberRepository.findByUserId(userId);
@@ -53,7 +53,7 @@ public class AuthProviderImpl implements IAuthProvider {
             accountEntity.setPassword(passwordEncoder.encode(account.getPassword()));
             accountRepository.save(accountEntity);
         } catch (Exception e) {
-            throw new InfraException("데이터 저장 중 오류", e);
+            throw new InfraException(0, "데이터 저장 중 오류", e);
         }
 
     }

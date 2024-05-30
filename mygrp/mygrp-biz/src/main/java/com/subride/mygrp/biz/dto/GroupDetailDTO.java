@@ -25,8 +25,5 @@ public class GroupDetailDTO {
     private Long fee;
     private int maxShareNum;
 
-    private Long payedFee;
-    private Long discountedFee;
-
     private List<MemberInfoDTO> members;
 }

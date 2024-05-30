@@ -75,6 +75,7 @@ public class SubRecommendServiceImpl implements ISubRecommendService {
         SubInfoDTO subInfoDTO = new SubInfoDTO();
         subInfoDTO.setId(sub.getId());
         subInfoDTO.setName(sub.getName());
+        subInfoDTO.setCategoryName(sub.getCategory().getCategoryName());
         subInfoDTO.setLogo(sub.getLogo());
         subInfoDTO.setDescription(sub.getDescription());
         subInfoDTO.setFee(sub.getFee());

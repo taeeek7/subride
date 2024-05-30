@@ -1,4 +1,19 @@
 dependencies {
     implementation project(':common')
     implementation project(':subrecommend:subrecommend-biz')
+
+    //-- OpenFeign Client: Blocking방식의 Http Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+}
+
+/*
+OpenFeign Client는 SpringCloud의 컴포넌트이기 때문에 Spring Cloud 종속성 관리 지정 필요
+Spring Boot 버전에 맞는 Spring Cloud 버전을 지정해야 함
+https://github.com/spring-cloud/spring-cloud-release/wiki/Supported-Versions#supported-releases
+*/
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.1"
+    }
 }

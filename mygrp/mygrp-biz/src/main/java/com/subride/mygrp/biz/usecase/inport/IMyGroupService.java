@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface IMyGroupService {
     List<Group> getMyGroupSummaryList(String userId);
-    Group getMyGroupDetail(Long myGroupId, String userId);
-    void createMyGroup(GroupCreateDTO groupCreateDTO);
+    Group getMyGroupDetail(Long myGroupId);
+    String createMyGroup(GroupCreateDTO groupCreateDTO);
     void joinMyGroup(GroupJoinDTO groupJoinDTO);
     void leaveMyGroup(Long myGroupId, String userId);
 }

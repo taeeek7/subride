@@ -1,11 +1,11 @@
 package com.subride.mysub.biz.usecase.inport;
 
-import com.subride.mysub.biz.dto.MySubDTO;
+import com.subride.common.dto.MySubInfoDTO;
 
 import java.util.List;
 
 public interface IMySubService {
-    List<MySubDTO> getMySubList(String userId);
+    List<MySubInfoDTO> getMySubList(String userId);
     void cancelSub(Long subId, String userId);
     void subscribeSub(Long subId, String userId);
 

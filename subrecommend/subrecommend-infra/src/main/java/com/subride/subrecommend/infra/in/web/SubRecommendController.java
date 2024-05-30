@@ -61,7 +61,7 @@ public class SubRecommendController {
         }
     }
 
-    @Operation(summary = "구독 서비스 리스트 리턴", description = "카테고리ID에 해당하는 구독서비스 정보 리턴")
+    @Operation(summary = "카테고리별 구독 서비스 리스트 리턴", description = "카테고리ID에 해당하는 구독서비스 정보 리턴")
     @Parameters({
         @Parameter(name = "categoryId", in = ParameterIn.QUERY, description = "카테고리ID", required = true)
     })
@@ -70,6 +70,26 @@ public class SubRecommendController {
         try {
             List<SubInfoDTO> subInfoDTOList = subRecommendService.getRecommendSubListByCategory(categoryId);
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독서비스 리턴", subInfoDTOList));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
+    }
+
+    @Operation(summary = "카테고리별 미구독 서비스 리스트만 리턴", description = "카테고리ID에 해당하는 미구독서비스 리스트 정보 리턴")
+    @Parameters({
+            @Parameter(name = "categoryId", in = ParameterIn.QUERY, description = "카테고리ID", required = true),
+            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
+    })
+    @GetMapping("/non-subscribe-list")
+    public ResponseEntity<ResponseDTO<List<SubInfoDTO>>> getNonSubList(@RequestParam String categoryId,
+                                                                       @RequestParam String userId) {
+        try {
+            List<SubInfoDTO> subInfoDTOList = subRecommendService.getRecommendSubListByCategory(categoryId);
+            List<SubInfoDTO> nonSubInfoDTOList = subRecommendControllerHelper.getNonSubList(subInfoDTOList, userId);
+
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "미구독서비스 리턴", nonSubInfoDTOList));
         } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {

@@ -1,11 +1,13 @@
 // File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/in/web/MySubControllerSystemTest.java
 package com.subride.mysub.infra.in.web;
 
+import com.subride.common.dto.GroupSummaryDTO;
 import com.subride.common.dto.ResponseDTO;
 import com.subride.mysub.infra.common.util.TestDataGenerator;
 import com.subride.common.dto.SubInfoDTO;
 import com.subride.mysub.infra.out.adapter.MySubProviderImpl;
 import com.subride.mysub.infra.out.entity.MySubEntity;
+import com.subride.mysub.infra.out.feign.MyGroupFeignClient;
 import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;
 import com.subride.mysub.infra.out.repo.IMySubRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +23,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +43,8 @@ public class MySubControllerSystemTest {
 
     @MockBean
     private SubRecommendFeignClient subRecommendFeignClient;
+    @MockBean
+    private MyGroupFeignClient myGroupFeignClient;
 
     private MySubProviderImpl mySubProvider;
     private String testUserId = "user01";
@@ -51,7 +56,7 @@ public class MySubControllerSystemTest {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .configureClient()
                 .build();
-        mySubProvider = new MySubProviderImpl(mySubRepository);
+        mySubProvider = new MySubProviderImpl(mySubRepository, subRecommendFeignClient, myGroupFeignClient);
 
         cleanup();  //테스트 데이터 모두 지움
 
@@ -70,10 +75,16 @@ public class MySubControllerSystemTest {
         String url = "/api/my-subs?userId=" + testUserId;
 
         //-- Feign Client로 구독추천에 요청하는 수행을 Stubbing함
-        SubInfoDTO subInfoDTO = new SubInfoDTO();
-        ResponseDTO<SubInfoDTO> response = ResponseDTO.<SubInfoDTO>builder()
-                .code(200).response(subInfoDTO).build();
-        given(subRecommendFeignClient.getSubDetail(any())).willReturn(response);
+        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = ResponseDTO.<List<GroupSummaryDTO>>builder()
+                .code(200)
+                .response(new ArrayList<>())
+                .build();
+        ResponseDTO<List<SubInfoDTO>> response = ResponseDTO.<List<SubInfoDTO>>builder()
+                .code(200)
+                .response(new ArrayList<>())
+                .build();
+        given(myGroupFeignClient.getMyGroupList(any())).willReturn(myGroupListResponse);
+        given(subRecommendFeignClient.getSubInfoListByIds(any())).willReturn(response);
 
         // When & Then
         webClient.get().uri(url)
@@ -92,6 +103,11 @@ public class MySubControllerSystemTest {
         MySubEntity mySubEntity = mySubRepository.findByUserId(testUserId).get(0);
         Long subId = mySubEntity.getSubId();
         String url = "/api/my-subs/" + subId + "?userId=" + testUserId;
+        ResponseDTO<List<Long>> response = ResponseDTO.<List<Long>>builder()
+                .code(200)
+                .response(new ArrayList<>())
+                .build();
+        given(myGroupFeignClient.getJoinSubIds(any())).willReturn(response);
 
         // When & Then
         webClient.delete().uri(url)

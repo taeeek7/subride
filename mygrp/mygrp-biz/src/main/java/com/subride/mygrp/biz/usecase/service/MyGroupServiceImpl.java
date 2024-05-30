@@ -26,12 +26,12 @@ public class MyGroupServiceImpl implements IMyGroupService {
     }
 
     @Override
-    public Group getMyGroupDetail(Long myGroupId, String userId) {
-        return myGroupProvider.getMyGroupByGroupId(myGroupId, userId);
+    public Group getMyGroupDetail(Long myGroupId) {
+        return myGroupProvider.getMyGroupByGroupId(myGroupId);
     }
 
     @Override
-    public void createMyGroup(GroupCreateDTO groupCreateDTO) {
+    public String createMyGroup(GroupCreateDTO groupCreateDTO) {
         Group myGroup = new Group();
         myGroup.setGroupName(groupCreateDTO.getGroupName());
         myGroup.setSubId(groupCreateDTO.getSubId());
@@ -41,9 +41,8 @@ public class MyGroupServiceImpl implements IMyGroupService {
         myGroup.setBankAccount(groupCreateDTO.getBankAccount());
         myGroup.setPaymentDay(groupCreateDTO.getPaymentDay());
         myGroup.setInviteCode(randomValueGenerator.generateUniqueRandomValue());
-        myGroup.setMaxShareNum(groupCreateDTO.getMaxShareNum());
 
-        myGroupProvider.createMyGroup(myGroup);
+        return myGroupProvider.createMyGroup(myGroup);
     }
 
     @Override

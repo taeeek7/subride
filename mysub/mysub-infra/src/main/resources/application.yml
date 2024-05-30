@@ -37,4 +37,5 @@ logging:
 feign:
   subrecommend:
     url: ${SUBRECOMMEND_URI:http://localhost:18081}
-
+  mygroup:
+    url: ${MYGRP_URI:http://localhost:18083}

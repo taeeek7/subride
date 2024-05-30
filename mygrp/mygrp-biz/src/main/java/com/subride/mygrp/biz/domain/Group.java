@@ -25,26 +25,6 @@ public class Group {
     private Long fee;
     private int maxShareNum;
 
-    private Long payedFee;
-    private Long discountedFee;
-
     private List<MemberInfoDTO> members;
 
-    //-- 실제로 내고 있는 구독료 계산
-    public void calulatePayedFee(String userId) {
-        if (this.memberIds.contains(userId)) {
-            this.payedFee = this.fee / this.memberIds.size();
-        } else {
-            this.payedFee = this.fee;
-        }
-    }
-
-    //-- 절감할 수 있는 금액 계산
-    public void calulateDiscountedFee(String userId) {
-        if (this.memberIds.contains(userId)) {
-            this.discountedFee = this.fee - this.fee / this.memberIds.size();
-        } else {
-            this.discountedFee = this.fee - this.fee / this.maxShareNum;
-        }
-    }
 }

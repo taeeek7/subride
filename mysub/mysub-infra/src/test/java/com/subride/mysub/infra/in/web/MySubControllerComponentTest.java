@@ -3,6 +3,7 @@ package com.subride.mysub.infra.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subride.common.dto.ResponseDTO;
+import com.subride.common.dto.SubInfoDTO;
 import com.subride.mysub.biz.dto.MySubDTO;
 import com.subride.mysub.biz.usecase.service.MySubServiceImpl;
 import com.subride.mysub.infra.common.config.SecurityConfig;

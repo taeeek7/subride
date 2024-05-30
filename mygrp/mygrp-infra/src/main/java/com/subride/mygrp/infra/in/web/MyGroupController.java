@@ -1,12 +1,12 @@
 package com.subride.mygrp.infra.in.web;
 
+import com.subride.common.dto.GroupSummaryDTO;
 import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
 import com.subride.mygrp.biz.domain.Group;
 import com.subride.mygrp.biz.dto.GroupCreateDTO;
 import com.subride.mygrp.biz.dto.GroupDetailDTO;
 import com.subride.mygrp.biz.dto.GroupJoinDTO;
-import com.subride.mygrp.biz.dto.GroupSummaryDTO;
 import com.subride.mygrp.biz.usecase.inport.IMyGroupService;
 import com.subride.mygrp.infra.exception.InfraException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,15 +58,13 @@ public class MyGroupController {
 
     @Operation(summary = "썹그룹 상세 정보 리턴")
     @Parameters({
-            @Parameter(name = "groupId", in = ParameterIn.PATH, description = "썹그룹ID", required = true),
-            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = false)
+            @Parameter(name = "groupId", in = ParameterIn.PATH, description = "썹그룹ID", required = true)
     })
     @GetMapping("/{groupId}")
-    public ResponseEntity<ResponseDTO<GroupDetailDTO>> getMyGroupDetail(
-            @PathVariable Long groupId, @RequestParam(required = false) String userId) {
+    public ResponseEntity<ResponseDTO<GroupDetailDTO>> getMyGroupDetail(@PathVariable Long groupId) {
 
         try {
-            Group group = myGroupService.getMyGroupDetail(groupId, userId);
+            Group group = myGroupService.getMyGroupDetail(groupId);
             GroupDetailDTO groupDetailDTO = myGroupControllerHelper.getGroupDetail(group);
 
             return ResponseEntity.ok(ResponseDTO.<GroupDetailDTO>builder()
@@ -84,13 +82,14 @@ public class MyGroupController {
 
     @Operation(summary = "썹그룹 생성", description = "새로운 썹그룹을 생성합니다.")
     @PostMapping
-    public ResponseEntity<ResponseDTO<Void>> createMyGroup(@RequestBody GroupCreateDTO groupCreateDTO) {
+    public ResponseEntity<ResponseDTO<String>> createMyGroup(@RequestBody GroupCreateDTO groupCreateDTO) {
         try {
-            myGroupService.createMyGroup(groupCreateDTO);
-            return ResponseEntity.ok(ResponseDTO.<Void>builder()
-                    .code(200)
-                    .message("마이그룹 생성 성공")
-                    .build());
+            List<String> nullFields = CommonUtils.getNullFields(groupCreateDTO);
+            if(!nullFields.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "입력 데이터에 널값이 있음"));
+            }
+            String inviteCode = myGroupService.createMyGroup(groupCreateDTO);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "썹그룹 생성 완료", inviteCode));
 
         } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
@@ -129,6 +128,22 @@ public class MyGroupController {
                     .code(200)
                     .message("마이그룹 탈퇴 성공")
                     .build());
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
+    }
+
+    @Operation(summary = "참여중인 썹그룹의 구독서비스ID 목록 리턴")
+    @Parameters({
+            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
+    })
+    @GetMapping("/sub-id-list")
+    public ResponseEntity<ResponseDTO<List<Long>>> getJoinSubIds(@RequestParam String userId) {
+        try {
+            List<Long> joinSubIds = myGroupControllerHelper.getJoinSubIds(userId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "참여중인 썹그룹의 구독서비스ID 목록", joinSubIds));
         } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.subride.mysub.biz.usecase.service;
 
+import com.subride.common.dto.MySubInfoDTO;
 import com.subride.mysub.biz.domain.MySub;
 import com.subride.mysub.biz.dto.MySubDTO;
 import com.subride.mysub.biz.usecase.inport.IMySubService;
@@ -8,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,11 +16,8 @@ public class MySubServiceImpl implements IMySubService {
     private final IMySubProvider mySubProvider;
 
     @Override
-    public List<MySubDTO> getMySubList(String userId) {
-        List<MySub> mySubList = mySubProvider.getMySubList(userId);
-        return mySubList.stream()
-                .map(this::toMySubDTO)
-                .collect(Collectors.toList());
+    public List<MySubInfoDTO> getMySubList(String userId) {
+        return mySubProvider.getMySubList(userId);
     }
 
     @Override

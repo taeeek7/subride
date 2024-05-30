@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "마이구독 서비스 API")
 @RestController
@@ -35,8 +36,28 @@ public class MySubController {
     @GetMapping
     public ResponseEntity<ResponseDTO<List<MySubInfoDTO>>> getMySubList(@RequestParam String userId) {
         try {
-            List<MySubInfoDTO> mySubInfoDTOList = mySubControllerHelper.toMySubInfoDTOList(mySubService.getMySubList(userId));
+            List<MySubInfoDTO> mySubInfoDTOList = mySubService.getMySubList(userId);
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 목록 조회 성공", mySubInfoDTOList));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
+    }
+
+    @Operation(summary = "가입 구독서비스 중 썹그룹에 참여하지 않은 목록 리턴")
+    @Parameters({
+            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
+    })
+    @GetMapping("/not-join-group")
+    public ResponseEntity<ResponseDTO<List<MySubInfoDTO>>> getNotJoinGroupSubList(@RequestParam String userId) {
+        try {
+            List<MySubInfoDTO> mySubInfoDTOList = mySubService.getMySubList(userId);
+            List<MySubInfoDTO> notJoinGroupSubList = mySubInfoDTOList.stream()
+                    .filter(mySubInfoDTO -> !mySubInfoDTO.isJoinGroup())
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 목록 조회 성공", notJoinGroupSubList));
         } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {
@@ -91,6 +112,22 @@ public class MySubController {
             boolean isSubscribed = mySubService.checkSubscription(userId, subId);
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 여부 확인 성공", isSubscribed));
         }  catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
+    }
+
+    @Operation(summary = "사용자의 가입 서비스ID 목록 리턴")
+    @Parameters({
+            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
+    })
+    @GetMapping("/sub-id-list")
+    public ResponseEntity<ResponseDTO<List<Long>>> getMySubIds(@RequestParam String userId) {
+        try {
+            List<Long> mySubIds = mySubControllerHelper.getMySubIds(userId);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "사용자 가입 서비스 ID 리턴", mySubIds));
+        } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));

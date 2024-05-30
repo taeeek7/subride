@@ -1,12 +1,12 @@
 package com.subride.mysub.biz.usecase.outport;
 
-import com.subride.mysub.biz.domain.MySub;
+import com.subride.common.dto.MySubInfoDTO;
 
 import java.util.List;
 
 public interface IMySubProvider {
 
-    List<MySub> getMySubList(String userId);
+    List<MySubInfoDTO> getMySubList(String userId);
     void cancelSub(Long subId, String userId);
     void subscribeSub(Long subId, String userId);
 

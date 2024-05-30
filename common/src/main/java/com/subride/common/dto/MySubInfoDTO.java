@@ -14,4 +14,7 @@ public class MySubInfoDTO {
     private String description;
     private Long fee;
     private int maxShareNum;
+    private boolean joinGroup;
+    private Long payedFee;
+    private Long discountedFee;
 }
