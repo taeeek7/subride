@@ -1,5 +1,6 @@
 package com.subride.mygrp.infra.in.web;
 
+import com.subride.common.dto.GroupMemberDTO;
 import com.subride.common.dto.GroupSummaryDTO;
 import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
@@ -144,6 +145,19 @@ public class MyGroupController {
         try {
             List<Long> joinSubIds = myGroupControllerHelper.getJoinSubIds(userId);
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "참여중인 썹그룹의 구독서비스ID 목록", joinSubIds));
+        } catch (InfraException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        }
+    }
+
+    @Operation(summary = "모든 썹그룹 멤버 목록 리턴")
+    @GetMapping("/all-members")
+    public ResponseEntity<ResponseDTO<List<GroupMemberDTO>>> getAllGroupMembers() {
+        try {
+            List<GroupMemberDTO> allGroupMemberss = myGroupControllerHelper.getAllGroupMembers();
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "모든 썹그룹 멤버 목록", allGroupMemberss));
         } catch (InfraException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {

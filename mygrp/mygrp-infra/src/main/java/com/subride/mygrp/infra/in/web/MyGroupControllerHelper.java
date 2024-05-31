@@ -1,5 +1,6 @@
 package com.subride.mygrp.infra.in.web;
 
+import com.subride.common.dto.GroupMemberDTO;
 import com.subride.common.dto.GroupSummaryDTO;
 import com.subride.mygrp.biz.domain.Group;
 import com.subride.mygrp.biz.dto.GroupDetailDTO;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,24 @@ public class MyGroupControllerHelper {
                 .map(GroupEntity::getSubId)
                 .collect(Collectors.toList());
 
+    }
+
+    public List<GroupMemberDTO> getAllGroupMembers() {
+        List<GroupEntity> groupEntityList = myGroupRepository.findAll();
+
+        if (groupEntityList == null || groupEntityList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return groupEntityList.stream()
+                .map(groupEntity -> {
+                    GroupMemberDTO groupMemberDTO = new GroupMemberDTO();
+                    groupMemberDTO.setGroupId(groupEntity.getGroupId());
+                    groupMemberDTO.setMemberIds(groupEntity.getMemberIds());
+                    groupMemberDTO.setPaymentDay(groupEntity.getPaymentDay());
+                    return groupMemberDTO;
+                })
+                .collect(Collectors.toList());
     }
 
     private GroupSummaryDTO toGroupSummaryDTO(Group myGroup) {

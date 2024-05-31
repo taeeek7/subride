@@ -1,7 +1,7 @@
-package com.subride.subrecommend.infra.common.config;
+package com.subride.transfer.common.config;
 
-import com.subride.subrecommend.infra.common.jwt.JwtAuthenticationFilter;
-import com.subride.subrecommend.infra.common.jwt.JwtTokenProvider;
+import com.subride.transfer.common.jwt.JwtAuthenticationFilter;
+import com.subride.transfer.common.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

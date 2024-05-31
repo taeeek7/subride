@@ -100,7 +100,7 @@ project(':common') {
 	jar.enabled = true
 }
 
-configure(subprojects.findAll { it.name.endsWith('-infra') }) {
+configure(subprojects.findAll { it.name.endsWith('-infra') || it.name == 'transfer'}) {
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

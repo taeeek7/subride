@@ -1,7 +1,6 @@
-// File: mysub/mysub-infra/build.gradle
+// File: transfer/build.gradle
 dependencies {
     implementation project(':common')
-    implementation project(':mysub:mysub-biz')
 
     //-- OpenFeign Client: Blocking방식의 Http Client
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
@@ -18,48 +17,15 @@ dependencyManagement {
     }
 }
 
-// File: mysub/mysub-infra/build/resources/main/application-test.yml
+// File: transfer/build/resources/main/application.yml
 server:
-  port: ${SERVER_PORT:18082}
+  port: ${SERVER_PORT:18084}
 spring:
   application:
-    name: ${SPRING_APPLICATION_NAME:mysub-service}
-  datasource:
-    driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
-    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///mysub}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:P@ssw0rd$}
-  jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: ${JPA_SHOW_SQL:false}
-    hibernate:
-      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
-    properties:
-      hibernate:
-        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
-jwt:
-  secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
-
-# Logging
-logging:
-  level:
-    root: INFO
-feign:
-  subrecommend:
-    url: ${SUBRECOMMEND_URI:http://localhost:18081}
-
-
-
-// File: mysub/mysub-infra/build/resources/main/application.yml
-server:
-  port: ${SERVER_PORT:18082}
-spring:
-  application:
-    name: ${SPRING_APPLICATION_NAME:mysub-service}
+    name: ${SPRING_APPLICATION_NAME:transfer-service}
   datasource:
     driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
-    url: ${DB_URL:jdbc:mysql://localhost:3306/mysub?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/subrecommend?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:P@ssw0rd$}
   jpa:
@@ -82,552 +48,19 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
-    com.subride.mysub.infra.in: DEBUG
-    com.subride.mysub.infra.out: DEBUG
-    feign:
-      codec:
-        logger:
-          level: DEBUG
-feign:
-  subrecommend:
-    url: ${SUBRECOMMEND_URI:http://localhost:18081}
-  mygroup:
-    url: ${MYGRP_URI:http://localhost:18083}
+    com.subride.subrecommend.infra.in: DEBUG
+    com.subride.subrecommend.infra.out: DEBUG
 
 
-// File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/out/adapter/MySubProviderImplComponentTest.java
-// File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/out/adapter/MySubProviderImplComponentTest.java
-package com.subride.mysub.infra.out.adapter;
-
-import com.subride.common.dto.GroupSummaryDTO;
-import com.subride.common.dto.MySubInfoDTO;
-import com.subride.common.dto.ResponseDTO;
-import com.subride.common.dto.SubInfoDTO;
-import com.subride.mysub.infra.common.util.TestDataGenerator;
-import com.subride.mysub.infra.exception.InfraException;
-import com.subride.mysub.infra.out.entity.MySubEntity;
-import com.subride.mysub.infra.out.feign.MyGroupFeignClient;
-import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;
-import com.subride.mysub.infra.out.repo.IMySubRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestPropertySource;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(properties = {
-        "spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
-        "spring.datasource.url=jdbc:tc:mysql:8.0.29:///mysub",
-        "spring.datasource.username=root",
-        "spring.datasource.password=P@ssw0rd$",
-        "spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect"
-})
-public class MySubProviderImplComponentTest {
-    @Autowired
-    private IMySubRepository mySubRepository;
-    @MockBean
-    private SubRecommendFeignClient subRecommendFeignClient;
-    @MockBean
-    private MyGroupFeignClient myGroupFeignClient;
-
-    private MySubProviderImpl mySubProvider;
-
-    @BeforeEach
-    void setup() {
-        mySubProvider = new MySubProviderImpl(mySubRepository, subRecommendFeignClient, myGroupFeignClient);
-        List<MySubEntity> mySubEntities = TestDataGenerator.generateMySubEntities("user01", 1L);
-        mySubRepository.saveAll(mySubEntities);
-    }
-
-    @AfterEach
-    void cleanup() {
-        mySubRepository.deleteAll();
-    }
-
-    @Test
-    void getMySubList_ValidUserId_ReturnMySubList() {
-        // Given
-        String userId = "user01";
-
-        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = ResponseDTO.<List<GroupSummaryDTO>>builder()
-                .code(200)
-                .response(List.of(new GroupSummaryDTO()))
-                .build();
-        ResponseDTO<List<SubInfoDTO>> response = ResponseDTO.<List<SubInfoDTO>>builder()
-                .code(200)
-                .response(List.of(new SubInfoDTO()))
-                .build();
-        given(myGroupFeignClient.getMyGroupList(any())).willReturn(myGroupListResponse);
-        given(subRecommendFeignClient.getSubInfoListByIds(any())).willReturn(response);
-
-        // When
-        List<MySubInfoDTO> mySubList = mySubProvider.getMySubList(userId);
-
-        // Then
-        assertThat(mySubList).isNotEmpty();
-        assertThat(mySubList.get(0).getUserId()).isEqualTo(userId);
-    }
-
-    @Test
-    void cancelSub_ValidUserIdAndSubId_DeleteMySub() {
-        // Given
-        String userId = "user01";
-        Long subId = 1L;
-        mySubProvider.subscribeSub(subId, userId);  //--테스트 데이터 등록
-
-        ResponseDTO<List<Long>> response = ResponseDTO.<List<Long>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
-        given(myGroupFeignClient.getJoinSubIds(any())).willReturn(response);
-
-        // When
-        mySubProvider.cancelSub(subId, userId);
-
-        // Then
-        Optional<MySubEntity> deletedMySub = mySubRepository.findByUserIdAndSubId(userId, subId);
-        assertThat(deletedMySub).isEmpty();
-    }
-
-    @Test
-    void cancelSub_InvalidUserIdAndSubId_ThrowInfraException() {
-        // Given
-        String userId = "invalidUser";
-        Long subId = 999L;
-
-        ResponseDTO<List<Long>> response = ResponseDTO.<List<Long>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
-        given(myGroupFeignClient.getJoinSubIds(any())).willReturn(response);
-
-        // When, Then
-        assertThatThrownBy(() -> mySubProvider.cancelSub(subId, userId))
-                .isInstanceOf(InfraException.class)
-                .hasMessage("구독 정보가 없습니다.");
-    }
-
-    @Test
-    void subscribeSub_ValidUserIdAndSubId_SaveMySub() {
-        // Given
-        String userId = "newUser";
-        Long subId = 100L;
-
-        // When
-        mySubProvider.subscribeSub(subId, userId);
-
-        // Then
-        Optional<MySubEntity> savedMySub = mySubRepository.findByUserIdAndSubId(userId, subId);
-        assertThat(savedMySub).isPresent();
-        assertThat(savedMySub.get().getUserId()).isEqualTo(userId);
-        assertThat(savedMySub.get().getSubId()).isEqualTo(subId);
-    }
-
-    @Test
-    void isSubscribed_SubscribedUserIdAndSubId_ReturnTrue() {
-        // Given
-        String userId = "user01";
-        Long subId = 900L;
-        mySubProvider.subscribeSub(subId, userId);  //--테스트 데이터 등록
-
-        // When
-        boolean isSubscribed = mySubProvider.isSubscribed(userId, subId);
-
-        // Then
-        assertThat(isSubscribed).isTrue();
-    }
-
-    @Test
-    void isSubscribed_NotSubscribedUserIdAndSubId_ReturnFalse() {
-        // Given
-        String userId = "user01";
-        Long subId = 999L;
-
-        // When
-        boolean isSubscribed = mySubProvider.isSubscribed(userId, subId);
-
-        // Then
-        assertThat(isSubscribed).isFalse();
-    }
-}
-
-// File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/in/web/MySubControllerSystemTest.java
-// File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/in/web/MySubControllerSystemTest.java
-package com.subride.mysub.infra.in.web;
-
-import com.subride.common.dto.GroupSummaryDTO;
-import com.subride.common.dto.ResponseDTO;
-import com.subride.common.dto.SubInfoDTO;
-import com.subride.mysub.infra.common.util.TestDataGenerator;
-import com.subride.mysub.infra.out.adapter.MySubProviderImpl;
-import com.subride.mysub.infra.out.entity.MySubEntity;
-import com.subride.mysub.infra.out.feign.MyGroupFeignClient;
-import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;
-import com.subride.mysub.infra.out.repo.IMySubRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@WithMockUser
-public class MySubControllerSystemTest {
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private IMySubRepository mySubRepository;
-
-    private WebTestClient webClient;
-
-    @MockBean
-    private SubRecommendFeignClient subRecommendFeignClient;
-    @MockBean
-    private MyGroupFeignClient myGroupFeignClient;
-
-    private MySubProviderImpl mySubProvider;
-    private String testUserId = "user01";
-    private Long testSubId = 1L;
-
-    @BeforeEach
-    void setup() {
-        webClient = MockMvcWebTestClient
-                .bindToApplicationContext(context)
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .configureClient()
-                .build();
-        mySubProvider = new MySubProviderImpl(mySubRepository, subRecommendFeignClient, myGroupFeignClient);
-
-        cleanup();  //테스트 데이터 모두 지움
-
-        List<MySubEntity> mySubEntities = TestDataGenerator.generateMySubEntities(testUserId, testSubId);
-        mySubRepository.saveAll(mySubEntities);
-
-        //testSubId = mySubRepository.findByUserId(testUserId).get(0).getSubId();
-    }
-
-    @AfterEach
-    void cleanup() {
-        mySubRepository.deleteAll();
-    }
-
-    @Test
-    void getMySubList_ValidUser_ReturnMySubList() {
-        // Given
-        String url = "/api/my-subs?userId=" + testUserId;
-
-        //-- Feign Client로 구독추천에 요청하는 수행을 Stubbing함
-        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = TestDataGenerator.generateResponseDTO(200, List.of(new GroupSummaryDTO()));
-        myGroupListResponse.getResponse().get(0).setSubId(testSubId);
-        ResponseDTO<List<SubInfoDTO>> response = TestDataGenerator.generateResponseDTO(200, List.of(new SubInfoDTO()));
-        response.getResponse().get(0).setSubId(testSubId);
-        given(myGroupFeignClient.getMyGroupList(any())).willReturn(myGroupListResponse);
-        given(subRecommendFeignClient.getSubInfoListByIds(any())).willReturn(response);
-
-        // When & Then
-        webClient.get().uri(url)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.code").isEqualTo(200)
-                .jsonPath("$.message").isEqualTo("구독 목록 조회 성공");
-    }
-
-    @Test
-    void cancelSub_ValidUserAndSub_Success() {
-        mySubProvider.subscribeSub(1L, testUserId);  //--테스트 데이터 등록
-
-        // Given
-        MySubEntity mySubEntity = mySubRepository.findByUserId(testUserId).get(0);
-        Long subId = mySubEntity.getSubId();
-        String url = "/api/my-subs/" + subId + "?userId=" + testUserId;
-        ResponseDTO<List<Long>> response = ResponseDTO.<List<Long>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
-        given(myGroupFeignClient.getJoinSubIds(any())).willReturn(response);
-
-        // When & Then
-        webClient.delete().uri(url)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.code").isEqualTo(200)
-                .jsonPath("$.message").isEqualTo("구독 취소 성공");
-    }
-
-    @Test
-    void subscribeSub_NewSub_Success() {
-        // Given
-        Long subId = 100L;
-        String url = "/api/my-subs/" + subId + "?userId=" + testUserId;
-
-        // When & Then
-        webClient.post().uri(url)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.code").isEqualTo(200)
-                .jsonPath("$.message").isEqualTo("구독 추가 성공");
-    }
-
-    @Test
-    void checkSubscription_SubscribedUser_ReturnTrue() {
-        // Given
-        MySubEntity mySubEntity = mySubRepository.findByUserId(testUserId).get(0);
-        Long subId = mySubEntity.getSubId();
-        String url = "/api/my-subs/checking-subscribe?userId=" + testUserId + "&subId=" + subId;
-
-        // When & Then
-        webClient.get().uri(url)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.code").isEqualTo(200)
-                .jsonPath("$.message").isEqualTo("구독 여부 확인 성공")
-                .jsonPath("$.response").isEqualTo(true);
-    }
-}
-
-// File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/in/web/MySubControllerComponentTest.java
-// File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/in/web/MySubControllerComponentTest.java
-package com.subride.mysub.infra.in.web;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.subride.common.dto.ResponseDTO;
-import com.subride.common.dto.SubInfoDTO;
-import com.subride.mysub.biz.dto.MySubDTO;
-import com.subride.mysub.biz.usecase.service.MySubServiceImpl;
-import com.subride.mysub.infra.common.config.SecurityConfig;
-import com.subride.mysub.infra.common.jwt.JwtTokenProvider;
-import com.subride.mysub.infra.out.adapter.MySubProviderImpl;
-import com.subride.mysub.infra.out.entity.MySubEntity;
-import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;
-import com.subride.mysub.infra.out.repo.IMySubRepository;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-@WebMvcTest(MySubController.class)
-@Import({SecurityConfig.class, JwtTokenProvider.class})
-public class MySubControllerComponentTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @SpyBean
-    private MySubControllerHelper mySubControllerHelper;
-    @SpyBean
-    private MySubServiceImpl mySubService;
-
-    @MockBean
-    private SubRecommendFeignClient subRecommendFeignClient;
-    @MockBean
-    private MySubProviderImpl mySubProvider;
-    @MockBean
-    private IMySubRepository mySubRepository;
-
-    @Test
-    @WithMockUser
-    void getMySubList() throws Exception {
-        // Given
-        String userId = "user01";
-        List<MySubDTO> mySubDTOList = new ArrayList<>();
-        mySubDTOList.add(new MySubDTO());
-
-        given(mySubProvider.getMySubList(any())).willReturn(new ArrayList<>());
-
-        // SubRecommendFeignClient의 동작을 Mocking
-        ResponseDTO<SubInfoDTO> responseDTO = ResponseDTO.<SubInfoDTO>builder()
-                .code(200)
-                .response(new SubInfoDTO())
-                .build();
-        given(subRecommendFeignClient.getSubDetail(any())).willReturn(responseDTO);
-
-        // When, Then
-        mockMvc.perform(get("/api/my-subs?userId=" + userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.response").isArray());
-    }
-
-    @Test
-    @WithMockUser
-    void cancelSub() throws Exception {
-        // Given
-        Long subId = 1L;
-        String userId = "user01";
-
-        MySubEntity mySubEntity = new MySubEntity();
-        given(mySubRepository.findByUserIdAndSubId(any(), any())).willReturn(Optional.of(mySubEntity));
-        doNothing().when(mySubRepository).delete(any());
-
-        // When, Then
-        mockMvc.perform(delete("/api/my-subs/{subId}?userId={userId}", subId, userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
-    }
-
-    @Test
-    @WithMockUser
-    void subscribeSub() throws Exception {
-        // Given
-        Long subId = 1L;
-        String userId = "user01";
-
-        MySubEntity mySubEntity = new MySubEntity();
-        given(mySubRepository.save(any())).willReturn(mySubEntity);
-
-        // When, Then
-        mockMvc.perform(post("/api/my-subs/{subId}?userId={userId}", subId, userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200));
-    }
-
-    @Test
-    @WithMockUser
-    void checkSubscription() throws Exception {
-        // Given
-        String userId = "user01";
-        Long subId = 1L;
-
-        given(mySubProvider.isSubscribed(any(), any())).willReturn(true);
-
-        // When, Then
-        mockMvc.perform(get("/api/my-subs/checking-subscribe?userId={userId}&subId={subId}", userId, subId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.response").value(true));
-    }
-}
-
-// File: mysub/mysub-infra/src/test/java/com/subride/mysub/infra/common/util/TestDataGenerator.java
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/common/util/TestDataGenerator.java
-package com.subride.mysub.infra.common.util;
-
-import com.subride.common.dto.ResponseDTO;
-import com.subride.mysub.infra.out.entity.MySubEntity;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-public class TestDataGenerator {
-    public static List<MySubEntity> generateMySubEntities(String userId, Long subId) {
-        List<MySubEntity> mySubEntities = new ArrayList<>();
-        Random random = new Random();
-        /*
-        for (int i = 0; i < 5; i++) {
-            MySubEntity mySubEntity = new MySubEntity();
-            mySubEntity.setUserId(userId);
-            mySubEntity.setSubId(random.nextLong(1, 100));
-            mySubEntities.add(mySubEntity);
-        }
-        */
-        MySubEntity mySubEntity = new MySubEntity();
-        mySubEntity.setUserId(userId);
-        mySubEntity.setSubId(subId);
-        mySubEntities.add(mySubEntity);
-        return mySubEntities;
-    }
-
-    public static <T> ResponseDTO<T> generateResponseDTO(int code, T response) {
-        return ResponseDTO.<T>builder()
-                .code(code)
-                .response(response)
-                .build();
-    }
-}
-
-// File: mysub/mysub-infra/src/main/resources/application-test.yml
+// File: transfer/src/main/resources/application.yml
 server:
-  port: ${SERVER_PORT:18082}
+  port: ${SERVER_PORT:18084}
 spring:
   application:
-    name: ${SPRING_APPLICATION_NAME:mysub-service}
-  datasource:
-    driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
-    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///mysub}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:P@ssw0rd$}
-  jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: ${JPA_SHOW_SQL:false}
-    hibernate:
-      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
-    properties:
-      hibernate:
-        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
-jwt:
-  secret: ${JWT_SECRET:8O2HQ13etL2BWZvYOiWsJ5uWFoLi6NBUG8divYVoCgtHVvlk3dqRksMl16toztDUeBTSIuOOPvHIrYq11G2BwQ==}
-
-# Logging
-logging:
-  level:
-    root: INFO
-feign:
-  subrecommend:
-    url: ${SUBRECOMMEND_URI:http://localhost:18081}
-
-
-
-// File: mysub/mysub-infra/src/main/resources/application.yml
-server:
-  port: ${SERVER_PORT:18082}
-spring:
-  application:
-    name: ${SPRING_APPLICATION_NAME:mysub-service}
+    name: ${SPRING_APPLICATION_NAME:transfer-service}
   datasource:
     driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
-    url: ${DB_URL:jdbc:mysql://localhost:3306/mysub?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/subrecommend?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:P@ssw0rd$}
   jpa:
@@ -650,21 +83,15 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
-    com.subride.mysub.infra.in: DEBUG
-    com.subride.mysub.infra.out: DEBUG
-    feign:
-      codec:
-        logger:
-          level: DEBUG
+    com.subride.subrecommend.infra.in: DEBUG
+    com.subride.subrecommend.infra.out: DEBUG
 feign:
-  subrecommend:
-    url: ${SUBRECOMMEND_URI:http://localhost:18081}
   mygroup:
     url: ${MYGRP_URI:http://localhost:18083}
 
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/MySubApplication.java
-package com.subride.mysub;
+// File: transfer/src/main/java/com/subride/transfer/TransferApplication.java
+package com.subride.transfer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -672,230 +99,117 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-public class MySubApplication {
+public class TransferApplication {
     public static void main(String[] args) {
-        SpringApplication.run(MySubApplication.class, args);
+        SpringApplication.run(TransferApplication.class, args);
     }
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/out/feign/SubRecommendFeignClient.java
-package com.subride.mysub.infra.out.feign;
 
-import com.subride.common.dto.ResponseDTO;
-import com.subride.common.dto.SubInfoDTO;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+// File: transfer/src/main/java/com/subride/transfer/persistent/repository/ITransferRepository.java
+package com.subride.transfer.persistent.repository;
 
+import com.subride.transfer.persistent.entity.Transfer;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.time.LocalDate;
 import java.util.List;
 
-@FeignClient(name = "subRecommendFeignClient", url = "${feign.subrecommend.url}")
-public interface SubRecommendFeignClient {
-    @GetMapping("/api/subrecommend/detail/{subId}")
-    ResponseDTO<SubInfoDTO> getSubDetail(@PathVariable("subId") Long subId);
-
-    @GetMapping("/api/subrecommend/list-by-ids")
-    ResponseDTO<List<SubInfoDTO>> getSubInfoListByIds(@RequestParam List<Long> subIds);
+public interface ITransferRepository extends JpaRepository<Transfer, Long> {
+    List<Transfer> findByGroupIdAndTransferDateBetween(Long groupId, LocalDate startDate, LocalDate endDate);
 }
 
-
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/out/feign/MyGroupFeignClient.java
-package com.subride.mysub.infra.out.feign;
-
-import com.subride.common.dto.GroupSummaryDTO;
-import com.subride.common.dto.ResponseDTO;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
-
-@FeignClient(name = "myGroupFeignClient", url = "${feign.mygroup.url}")
-public interface MyGroupFeignClient {
-    @GetMapping("/api/my-groups")
-    ResponseDTO<List<GroupSummaryDTO>> getMyGroupList(@RequestParam String userId);
-    @GetMapping("/sub-id-list")
-    ResponseDTO<List<Long>> getJoinSubIds(@RequestParam String userId);
-}
-
-
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/out/entity/MySubEntity.java
-package com.subride.mysub.infra.out.entity;
-
-import com.subride.mysub.biz.domain.MySub;
-import lombok.*;
+// File: transfer/src/main/java/com/subride/transfer/persistent/entity/Transfer.java
+package com.subride.transfer.persistent.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "my_sub")
+@Table(name = "transfer")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MySubEntity {
+public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
-    private String userId;
+    @Column(name = "group_id")
+    private Long groupId;
 
-    @Column(name = "sub_id")
-    private Long subId;
+    @Column(name = "member_id")
+    private Long memberId;
 
-    public MySub toDomain() {
-        MySub mySub = new MySub();
-        mySub.setUserId(userId);
-        mySub.setSubId(subId);
-        return mySub;
-    }
+    @Column(name = "amount")
+    private BigDecimal amount;
+
+    @Column(name = "transfer_date")
+    private LocalDate transferDate;
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/out/adapter/MySubProviderImpl.java
-package com.subride.mysub.infra.out.adapter;
+// File: transfer/src/main/java/com/subride/transfer/persistent/dao/TransferProvider.java
+package com.subride.transfer.persistent.dao;
 
-import com.subride.common.dto.GroupSummaryDTO;
-import com.subride.common.dto.MySubInfoDTO;
-import com.subride.common.dto.ResponseDTO;
-import com.subride.common.dto.SubInfoDTO;
-import com.subride.mysub.biz.usecase.outport.IMySubProvider;
-import com.subride.mysub.infra.exception.InfraException;
-import com.subride.mysub.infra.out.entity.MySubEntity;
-import com.subride.mysub.infra.out.feign.MyGroupFeignClient;
-import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;
-import com.subride.mysub.infra.out.repo.IMySubRepository;
+import com.subride.transfer.common.dto.TransferResponse;
+import com.subride.transfer.persistent.entity.Transfer;
+import com.subride.transfer.common.enums.Period;
+import com.subride.transfer.common.exception.TransferException;
+import com.subride.transfer.persistent.repository.ITransferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class MySubProviderImpl implements IMySubProvider {
-    private final IMySubRepository mySubRepository;
-    private final SubRecommendFeignClient subRecommendFeignClient;
-    private final MyGroupFeignClient myGroupFeignClient;
+public class TransferProvider {
+    private final ITransferRepository transferRepository;
 
-    @Override
-    public List<MySubInfoDTO> getMySubList(String userId) {
-        List<MySubEntity> mySubEntityList = mySubRepository.findByUserId(userId);
-        if (mySubEntityList.isEmpty()) {
-            // userId에 해당하는 MySubEntity가 없는 경우 처리
-            throw new InfraException(0, "해당 사용자의 구독 정보가 없습니다.");
+    public List<TransferResponse> getTransferHistory(Long groupId, Period period) {
+        LocalDate endDate = LocalDate.now();
+        LocalDate startDate;
+
+        if (period == Period.THREE_MONTHS) {
+            startDate = endDate.minusMonths(3);
+        } else if (period == Period.ONE_YEAR) {
+            startDate = endDate.minusYears(1);
+        } else {
+            throw new TransferException("잘못된 조회 기간입니다.");
         }
 
-        List<Long> mySubIds = mySubEntityList.stream()
-                .map(MySubEntity::getSubId)
-                .collect(Collectors.toList());
+        List<Transfer> transferList = transferRepository.findByGroupIdAndTransferDateBetween(groupId, startDate, endDate);
 
-        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = myGroupFeignClient.getMyGroupList(userId);
-        List<GroupSummaryDTO> myGroupList = myGroupListResponse.getResponse();
-
-        ResponseDTO<List<SubInfoDTO>> response = subRecommendFeignClient.getSubInfoListByIds(mySubIds);
-        List<SubInfoDTO> subInfoList = response.getResponse();
-
-        return mySubEntityList.stream()
-                .map(mySubEntity -> {
-                    MySubInfoDTO mySubInfoDTO = new MySubInfoDTO();
-                    mySubInfoDTO.setUserId(mySubEntity.getUserId());
-                    mySubInfoDTO.setSubId(mySubEntity.getSubId());
-
-                    //구독정보 찾기
-                    SubInfoDTO subInfo = subInfoList.stream()
-                            .filter(dto -> dto.getSubId().equals(mySubEntity.getSubId()))
-                            .findFirst()
-                            .orElse(null);
-
-                    if(subInfo != null) {
-                        mySubInfoDTO.setSubName(subInfo.getSubName());
-                        mySubInfoDTO.setCategoryName(subInfo.getCategoryName());
-                        mySubInfoDTO.setLogo(subInfo.getLogo());
-                        mySubInfoDTO.setDescription(subInfo.getDescription());
-                        mySubInfoDTO.setFee(subInfo.getFee());
-                        mySubInfoDTO.setMaxShareNum(subInfo.getMaxShareNum());
-
-                        // joinGroupMemberCountList에서 동일한 subId를 가진 객체 찾기
-                        GroupSummaryDTO groupSummaryDTO = myGroupList.stream()
-                                .filter(dto -> dto.getSubId().equals(mySubEntity.getSubId()))
-                                .findFirst()
-                                .orElse(null);
-
-                        if (groupSummaryDTO != null) {
-                            mySubInfoDTO.setJoinGroup(true);
-                            mySubInfoDTO.setPayedFee(subInfo.getFee() / groupSummaryDTO.getMemberCount());
-                            mySubInfoDTO.setDiscountedFee(0L);
-                        } else {
-                            mySubInfoDTO.setJoinGroup(false);
-                            mySubInfoDTO.setPayedFee(subInfo.getFee());
-                            mySubInfoDTO.setDiscountedFee(subInfo.getFee() - subInfo.getFee() / subInfo.getMaxShareNum());
-                        }
-                    }
-                    return mySubInfoDTO;
-                })
+        return transferList.stream()
+                .map(this::toTransferResponse)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void cancelSub(Long subId, String userId) {
-        MySubEntity mySubEntity = mySubRepository.findByUserIdAndSubId(userId, subId)
-                .orElseThrow(() -> new InfraException("구독 정보가 없습니다."));
-
-        ResponseDTO<List<Long>> response = myGroupFeignClient.getJoinSubIds(userId);
-        List<Long> joinSubIds = response.getResponse();
-
-        // joinGroupMemberCountList에서 해당 subId를 가진 그룹이 있는지 확인
-        boolean isJoinedGroup = joinSubIds.contains(subId);
-
-        if (isJoinedGroup) {
-            throw new InfraException(0, "썹 그룹에 참여중인 서비스는 가입취소 할 수 없습니다.");
-        }
-
-        mySubRepository.delete(mySubEntity);
-    }
-
-    @Override
-    public void subscribeSub(Long subId, String userId) {
-
-        MySubEntity mySubEntity = MySubEntity.builder()
-                .userId(userId)
-                .subId(subId)
+    private TransferResponse toTransferResponse(Transfer transfer) {
+        return TransferResponse.builder()
+                .memberId(transfer.getMemberId())
+                .amount(transfer.getAmount())
+                .transferDate(transfer.getTransferDate())
                 .build();
-        mySubRepository.save(mySubEntity);
-    }
-
-    @Override
-    public boolean isSubscribed(String userId, Long subId) {
-        return mySubRepository.existsByUserIdAndSubId(userId, subId);
     }
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/out/repo/IMySubRepository.java
-package com.subride.mysub.infra.out.repo;
+// File: transfer/src/main/java/com/subride/transfer/controller/TransferController.java
+package com.subride.transfer.controller;
 
-import com.subride.mysub.infra.out.entity.MySubEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
-import java.util.Optional;
-
-public interface IMySubRepository extends JpaRepository<MySubEntity, Long> {
-    List<MySubEntity> findByUserId(String userId);
-    Optional<MySubEntity> findByUserIdAndSubId(String userId, Long subId);
-    boolean existsByUserIdAndSubId(String userId, Long subId);
-}
-
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/in/web/MySubController.java
-package com.subride.mysub.infra.in.web;
-
-import com.subride.common.dto.MySubInfoDTO;
 import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
-import com.subride.mysub.biz.usecase.inport.IMySubService;
-import com.subride.mysub.infra.exception.InfraException;
+import com.subride.transfer.common.dto.TransferResponse;
+import com.subride.transfer.common.enums.Period;
+import com.subride.transfer.common.exception.TransferException;
+import com.subride.transfer.service.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -905,120 +219,34 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Tag(name = "마이구독 서비스 API")
+@Tag(name = "이체조회 서비스 API")
 @RestController
-@RequestMapping("/api/my-subs")
-@SecurityRequirement(name = "bearerAuth")    //이 어노테이션이 없으면 요청 헤더에 Authorization헤더가 안 생김
-@SuppressWarnings("unused")
+@RequestMapping("/api/transfers")
+@SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
-public class MySubController {
-    private final IMySubService mySubService;
-    private final MySubControllerHelper mySubControllerHelper;
+public class TransferController {
+    private final TransferService transferService;
 
-    @Operation(summary = "사용자 가입 구독서비스 목록 리턴", description = "구독추천 서비스에 요청하여 구독서비스 정보를 모두 담아 리턴함")
+    @Operation(summary = "이체내역 조회", description = "특정 그룹의 이체내역을 조회합니다.")
     @Parameters({
-            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
+            @Parameter(name = "groupId", in = ParameterIn.QUERY, description = "그룹 ID", required = true),
+            @Parameter(name = "period", in = ParameterIn.QUERY, description = "조회 기간 (THREE_MONTHS, ONE_YEAR)", required = true)
     })
     @GetMapping
-    public ResponseEntity<ResponseDTO<List<MySubInfoDTO>>> getMySubList(@RequestParam String userId) {
+    public ResponseEntity<ResponseDTO<List<TransferResponse>>> getTransferHistory(
+            @RequestParam Long groupId,
+            @RequestParam Period period) {
         try {
-            List<MySubInfoDTO> mySubInfoDTOList = mySubService.getMySubList(userId);
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 목록 조회 성공", mySubInfoDTOList));
-        } catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
-        }
-    }
-
-    @Operation(summary = "가입 구독서비스 중 썹그룹에 참여하지 않은 목록 리턴")
-    @Parameters({
-            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
-    })
-    @GetMapping("/not-join-group")
-    public ResponseEntity<ResponseDTO<List<MySubInfoDTO>>> getNotJoinGroupSubList(@RequestParam String userId) {
-        try {
-            List<MySubInfoDTO> mySubInfoDTOList = mySubService.getMySubList(userId);
-            List<MySubInfoDTO> notJoinGroupSubList = mySubInfoDTOList.stream()
-                    .filter(mySubInfoDTO -> !mySubInfoDTO.isJoinGroup())
-                    .collect(Collectors.toList());
-
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 목록 조회 성공", notJoinGroupSubList));
-        } catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
-        }
-    }
-
-    @Operation(summary = "구독 취소", description = "구독서비스를 삭제합니다.")
-    @Parameters({
-            @Parameter(name = "subId", in = ParameterIn.PATH, description = "구독서비스 ID", required = true),
-            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자 ID", required = true)
-    })
-    @DeleteMapping("/{subId}")
-    public ResponseEntity<ResponseDTO<Void>> cancelSub(@PathVariable Long subId, @RequestParam String userId) {
-        try {
-            mySubService.cancelSub(subId, userId);
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 취소 성공", null));
-        }  catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
-        }
-    }
-
-    @Operation(summary = "구독 등록", description = "구독서비스를 등록합니다.")
-    @Parameters({
-            @Parameter(name = "subId", in = ParameterIn.PATH, description = "구독서비스 ID", required = true),
-            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자 ID", required = true)
-    })
-    @PostMapping("/{subId}")
-    public ResponseEntity<ResponseDTO<Void>> subscribeSub(@PathVariable Long subId, @RequestParam String userId) {
-        try {
-            mySubService.subscribeSub(subId, userId);
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 추가 성공", null));
-        }  catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
-        }
-    }
-
-    @Operation(summary = "구독여부 리턴", description = "사용자가 구독서비스를 가입했는지 여부를 리턴")
-    @Parameters({
-            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자 ID", required = true),
-            @Parameter(name = "subId", in = ParameterIn.QUERY, description = "구독서비스 ID", required = true)
-    })
-    @GetMapping("/checking-subscribe")
-    public ResponseEntity<ResponseDTO<Boolean>> checkSubscription(
-            @RequestParam String userId,
-            @RequestParam Long subId) {
-        try {
-            boolean isSubscribed = mySubService.checkSubscription(userId, subId);
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "구독 여부 확인 성공", isSubscribed));
-        }  catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
-        }
-    }
-
-    @Operation(summary = "사용자의 가입 서비스ID 목록 리턴")
-    @Parameters({
-            @Parameter(name = "userId", in = ParameterIn.QUERY, description = "사용자ID", required = true)
-    })
-    @GetMapping("/sub-id-list")
-    public ResponseEntity<ResponseDTO<List<Long>>> getMySubIds(@RequestParam String userId) {
-        try {
-            List<Long> mySubIds = mySubControllerHelper.getMySubIds(userId);
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "사용자 가입 서비스 ID 리턴", mySubIds));
-        } catch (InfraException e) {
+            List<TransferResponse> transferHistory = transferService.getTransferHistory(groupId, period);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "이체내역 조회 성공", transferHistory));
+        } catch (TransferException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
@@ -1026,32 +254,42 @@ public class MySubController {
     }
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/in/web/MySubControllerHelper.java
-package com.subride.mysub.infra.in.web;
+// File: transfer/src/main/java/com/subride/transfer/common/dto/TransferRequest.java
+package com.subride.transfer.common.dto;
 
-import com.subride.mysub.infra.out.entity.MySubEntity;
-import com.subride.mysub.infra.out.repo.IMySubRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.subride.transfer.common.enums.Period;
+import lombok.Getter;
+import lombok.Setter;
 
-@Component
-@RequiredArgsConstructor
-public class MySubControllerHelper {
-    private final IMySubRepository mySubRepository;
-
-    public List<Long> getMySubIds(String userId) {
-        List<MySubEntity> mySubEntityList = mySubRepository.findByUserId(userId);
-        return mySubEntityList.stream()
-                .map(MySubEntity::getSubId)
-                .collect(Collectors.toList());
-    }
+@Getter
+@Setter
+public class TransferRequest {
+    private Long groupId;
+    private Period period;
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/common/jwt/JwtAuthenticationInterceptor.java
-package com.subride.mysub.infra.common.jwt;
+// File: transfer/src/main/java/com/subride/transfer/common/dto/TransferResponse.java
+package com.subride.transfer.common.dto;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Getter
+@Setter
+@Builder
+public class TransferResponse {
+    private Long memberId;
+    private BigDecimal amount;
+    private LocalDate transferDate;
+}
+
+// File: transfer/src/main/java/com/subride/transfer/common/jwt/JwtAuthenticationInterceptor.java
+package com.subride.transfer.common.jwt;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -1078,9 +316,9 @@ public class JwtAuthenticationInterceptor implements RequestInterceptor {
     }
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/common/jwt/JwtAuthenticationFilter.java
+// File: transfer/src/main/java/com/subride/transfer/common/jwt/JwtAuthenticationFilter.java
 // CommonJwtAuthenticationFilter.java
-package com.subride.mysub.infra.common.jwt;
+package com.subride.transfer.common.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -1122,16 +360,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/common/jwt/JwtTokenProvider.java
+// File: transfer/src/main/java/com/subride/transfer/common/jwt/JwtTokenProvider.java
 // CommonJwtTokenProvider.java
-package com.subride.mysub.infra.common.jwt;
+package com.subride.transfer.common.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.subride.mysub.infra.exception.InfraException;
+import com.subride.transfer.common.exception.TransferException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -1166,7 +404,7 @@ public class JwtTokenProvider {
 
             return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
         } catch (Exception e) {
-            throw new InfraException(0, "Invalid refresh token");
+            throw new TransferException(0, "Invalid refresh token");
         }
     }
 
@@ -1181,11 +419,28 @@ public class JwtTokenProvider {
     }
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/common/config/SecurityConfig.java
-package com.subride.mysub.infra.common.config;
+// File: transfer/src/main/java/com/subride/transfer/common/feign/MyGroupFeignClient.java
+package com.subride.transfer.common.feign;
 
-import com.subride.mysub.infra.common.jwt.JwtAuthenticationFilter;
-import com.subride.mysub.infra.common.jwt.JwtTokenProvider;
+import com.subride.common.dto.GroupMemberDTO;
+import com.subride.common.dto.ResponseDTO;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
+
+@FeignClient(name = "myGroupFeignClient", url = "${feign.mygroup.url}")
+public interface MyGroupFeignClient {
+    @GetMapping("/api/my-groups/all-members")
+    ResponseDTO<List<GroupMemberDTO>> getAllGroupMembers();
+}
+
+
+// File: transfer/src/main/java/com/subride/transfer/common/config/SecurityConfig.java
+package com.subride.transfer.common.config;
+
+import com.subride.transfer.common.jwt.JwtAuthenticationFilter;
+import com.subride.transfer.common.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -1244,8 +499,8 @@ public class SecurityConfig {
 }
 
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/common/config/LoggingAspect.java
-package com.subride.mysub.infra.common.config;
+// File: transfer/src/main/java/com/subride/transfer/common/config/LoggingAspect.java
+package com.subride.transfer.common.config;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -1356,8 +611,8 @@ public class LoggingAspect {
     }
 }
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/common/config/SpringDocConfig.java
-package com.subride.mysub.infra.common.config;
+// File: transfer/src/main/java/com/subride/transfer/common/config/SpringDocConfig.java
+package com.subride.transfer.common.config;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -1380,33 +635,41 @@ public class SpringDocConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("마이구독 서비스 API")
+                        .title("구독추천 서비스 API")
                         .version("v1.0.0")
-                        .description("마이구독 서비스 API 명세서입니다. "));
+                        .description("구독추천 서비스 API 명세서입니다. "));
     }
 }
 
 
-// File: mysub/mysub-infra/src/main/java/com/subride/mysub/infra/exception/InfraException.java
-package com.subride.mysub.infra.exception;
+// File: transfer/src/main/java/com/subride/transfer/common/enums/Period.java
+package com.subride.transfer.common.enums;
 
-public class InfraException extends RuntimeException {
+public enum Period {
+    THREE_MONTHS,
+    ONE_YEAR
+}
+
+// File: transfer/src/main/java/com/subride/transfer/common/exception/TransferException.java
+package com.subride.transfer.common.exception;
+
+public class TransferException extends RuntimeException {
     private int code;
 
-    public InfraException(String message) {
+    public TransferException(String message) {
         super(message);
     }
 
-    public InfraException(String message, Throwable cause) {
+    public TransferException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InfraException(int code, String message) {
+    public TransferException(int code, String message) {
         super(message);
         this.code = code;
     }
 
-    public InfraException(int code, String message, Throwable cause) {
+    public TransferException(int code, String message, Throwable cause) {
         super(message, cause);
         this.code = code;
     }
@@ -1416,63 +679,12 @@ public class InfraException extends RuntimeException {
     }
 }
 
-// File: mysub/mysub-biz/build.gradle
-dependencies {
-    implementation project(':common')
-}
+// File: transfer/src/main/java/com/subride/transfer/service/TransferService.java
+package com.subride.transfer.service;
 
-// File: mysub/mysub-biz/src/main/java/com/subride/mysub/biz/dto/MySubDTO.java
-package com.subride.mysub.biz.dto;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class MySubDTO {
-    private String userId;
-    private Long subId;
-}
-
-// File: mysub/mysub-biz/src/main/java/com/subride/mysub/biz/usecase/inport/IMySubService.java
-package com.subride.mysub.biz.usecase.inport;
-
-import com.subride.common.dto.MySubInfoDTO;
-
-import java.util.List;
-
-public interface IMySubService {
-    List<MySubInfoDTO> getMySubList(String userId);
-    void cancelSub(Long subId, String userId);
-    void subscribeSub(Long subId, String userId);
-
-    boolean checkSubscription(String userId, Long subId);
-}
-
-// File: mysub/mysub-biz/src/main/java/com/subride/mysub/biz/usecase/outport/IMySubProvider.java
-package com.subride.mysub.biz.usecase.outport;
-
-import com.subride.common.dto.MySubInfoDTO;
-
-import java.util.List;
-
-public interface IMySubProvider {
-
-    List<MySubInfoDTO> getMySubList(String userId);
-    void cancelSub(Long subId, String userId);
-    void subscribeSub(Long subId, String userId);
-
-    boolean isSubscribed(String userId, Long subId);
-}
-
-// File: mysub/mysub-biz/src/main/java/com/subride/mysub/biz/usecase/service/MySubServiceImpl.java
-package com.subride.mysub.biz.usecase.service;
-
-import com.subride.common.dto.MySubInfoDTO;
-import com.subride.mysub.biz.domain.MySub;
-import com.subride.mysub.biz.dto.MySubDTO;
-import com.subride.mysub.biz.usecase.inport.IMySubService;
-import com.subride.mysub.biz.usecase.outport.IMySubProvider;
+import com.subride.transfer.persistent.dao.TransferProvider;
+import com.subride.transfer.common.dto.TransferResponse;
+import com.subride.transfer.common.enums.Period;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -1480,60 +692,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MySubServiceImpl implements IMySubService {
-    private final IMySubProvider mySubProvider;
+public class TransferService {
+    private final TransferProvider transferProvider;
 
-    @Override
-    public List<MySubInfoDTO> getMySubList(String userId) {
-        return mySubProvider.getMySubList(userId);
-    }
-
-    @Override
-    public void cancelSub(Long subId, String userId) {
-        mySubProvider.cancelSub(subId, userId);
-    }
-
-    @Override
-    public void subscribeSub(Long subId, String userId) {
-        mySubProvider.subscribeSub(subId, userId);
-    }
-
-    private MySubDTO toMySubDTO(MySub mySub) {
-        MySubDTO mySubDTO = new MySubDTO();
-        mySubDTO.setUserId(mySub.getUserId());
-        mySubDTO.setSubId(mySub.getSubId());
-        return mySubDTO;
-    }
-
-    @Override
-    public boolean checkSubscription(String userId, Long subId) {
-        return mySubProvider.isSubscribed(userId, subId);
-    }
-}
-
-// File: mysub/mysub-biz/src/main/java/com/subride/mysub/biz/domain/MySub.java
-package com.subride.mysub.biz.domain;
-
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class MySub {
-    private String userId;
-    private Long subId;
-}
-
-// File: mysub/mysub-biz/src/main/java/com/subride/mysub/biz/exception/BizException.java
-package com.subride.mysub.biz.exception;
-
-public class BizException extends RuntimeException {
-    public BizException(String message) {
-        super(message);
-    }
-
-    public BizException(String message, Throwable cause) {
-        super(message, cause);
+    public List<TransferResponse> getTransferHistory(Long groupId, Period period) {
+        return transferProvider.getTransferHistory(groupId, period);
     }
 }
 
@@ -1548,6 +711,7 @@ include 'mysub:mysub-infra'
 include 'mysub:mysub-biz'
 include 'mygrp:mygrp-infra'
 include 'mygrp:mygrp-biz'
+include 'transfer'
 
 
 
@@ -1654,7 +818,7 @@ project(':common') {
 	jar.enabled = true
 }
 
-configure(subprojects.findAll { it.name.endsWith('-infra') }) {
+configure(subprojects.findAll { it.name.endsWith('-infra') || it.name == 'transfer'}) {
 	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
