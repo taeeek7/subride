@@ -24,7 +24,6 @@ public class LoggingAspect {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
         Object[] args = joinPoint.getArgs();
-
         String argString = getArgumentString(args);
 
         log.info("[START] {}.{} - Args: [{}]", className, methodName, argString);
