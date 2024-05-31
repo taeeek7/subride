@@ -116,3 +116,27 @@ configure(subprojects.findAll { it.name.endsWith('-biz') }) {
 	bootJar.enabled = false
 	jar.enabled = true
 }
+
+// Define a custom task to build all infra projects
+tasks.register('buildAll') {
+	dependsOn ':member:member-infra:build',
+			':subrecommend:subrecommend-infra:build',
+			':mysub:mysub-infra:build',
+			':mygrp:mygrp-infra:build'
+}
+tasks.register('ms1') {
+	dependsOn ':member:member-infra:build'
+}
+tasks.register('ms2') {
+	dependsOn ':subrecommend:subrecommend-infra:build'
+}
+tasks.register('ms3') {
+	dependsOn ':mysub:mysub-infra:build'
+}
+tasks.register('ms4') {
+	dependsOn ':mygrp:mygrp-infra:build'
+}
+tasks.register('ms5') {
+	dependsOn ':transfer:transfer-infra:build'
+}
+

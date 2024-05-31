@@ -89,10 +89,8 @@ public class MyGroupProviderImpl implements IMyGroupProvider {
     @Override
     @Transactional
     public void joinMyGroup(GroupJoinDTO groupJoinDTO) {
-        GroupEntity groupEntity = myGroupRepository.findByInviteCode(groupJoinDTO.getInviteCode());
-        if (groupEntity == null) {
-            throw new InfraException(0, "초대코드에 해당하는 썹그룹이 없습니다.");
-        }
+        GroupEntity groupEntity = myGroupRepository.findByInviteCode(groupJoinDTO.getInviteCode())
+                .orElseThrow(() -> new InfraException(0, "초대코드에 해당하는 썹그룹이 없습니다."));
 
         if (groupEntity.getMemberIds().contains(groupJoinDTO.getUserId())) {
             throw new InfraException(0, "이미 썹그룹에 참석하였습니다.");

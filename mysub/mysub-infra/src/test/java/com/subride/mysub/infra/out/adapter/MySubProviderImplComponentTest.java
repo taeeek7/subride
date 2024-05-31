@@ -48,10 +48,14 @@ public class MySubProviderImplComponentTest {
 
     private MySubProviderImpl mySubProvider;
 
+    private String testUserId = TestDataGenerator.testUserId;
+    private Long testSubId = TestDataGenerator.testSubId;
+    private Long testGroupId = TestDataGenerator.testGroupId;
+
     @BeforeEach
     void setup() {
         mySubProvider = new MySubProviderImpl(mySubRepository, subRecommendFeignClient, myGroupFeignClient);
-        List<MySubEntity> mySubEntities = TestDataGenerator.generateMySubEntities("user01");
+        List<MySubEntity> mySubEntities = TestDataGenerator.generateMySubEntities();
         mySubRepository.saveAll(mySubEntities);
     }
 
@@ -63,16 +67,15 @@ public class MySubProviderImplComponentTest {
     @Test
     void getMySubList_ValidUserId_ReturnMySubList() {
         // Given
-        String userId = "user01";
+        String userId = testUserId;
 
-        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = ResponseDTO.<List<GroupSummaryDTO>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
-        ResponseDTO<List<SubInfoDTO>> response = ResponseDTO.<List<SubInfoDTO>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
+        //-- Feign Client로 구독추천에 요청하는 수행을 Stubbing함
+        GroupSummaryDTO groupSummaryDTO = TestDataGenerator.generateGroupSumaryDTO();
+        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = TestDataGenerator.generateResponseDTO(200, List.of(groupSummaryDTO));
+
+        SubInfoDTO subInfoDTO = TestDataGenerator.generateSubInfoDTO();
+        ResponseDTO<List<SubInfoDTO>> response = TestDataGenerator.generateResponseDTO(200, List.of(subInfoDTO));
+
         given(myGroupFeignClient.getMyGroupList(any())).willReturn(myGroupListResponse);
         given(subRecommendFeignClient.getSubInfoListByIds(any())).willReturn(response);
 
@@ -87,14 +90,11 @@ public class MySubProviderImplComponentTest {
     @Test
     void cancelSub_ValidUserIdAndSubId_DeleteMySub() {
         // Given
-        String userId = "user01";
+        String userId = "user02";
         Long subId = 1L;
         mySubProvider.subscribeSub(subId, userId);  //--테스트 데이터 등록
 
-        ResponseDTO<List<Long>> response = ResponseDTO.<List<Long>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
+        ResponseDTO<List<Long>> response = TestDataGenerator.generateResponseDTO(200, List.of(999L));
         given(myGroupFeignClient.getJoinSubIds(any())).willReturn(response);
 
         // When
@@ -126,8 +126,8 @@ public class MySubProviderImplComponentTest {
     @Test
     void subscribeSub_ValidUserIdAndSubId_SaveMySub() {
         // Given
-        String userId = "newUser";
-        Long subId = 100L;
+        String userId = "user03";
+        Long subId = 1L;
 
         // When
         mySubProvider.subscribeSub(subId, userId);
@@ -142,8 +142,8 @@ public class MySubProviderImplComponentTest {
     @Test
     void isSubscribed_SubscribedUserIdAndSubId_ReturnTrue() {
         // Given
-        String userId = "user01";
-        Long subId = 900L;
+        String userId = testUserId;
+        Long subId = 100L;
         mySubProvider.subscribeSub(subId, userId);  //--테스트 데이터 등록
 
         // When
@@ -156,7 +156,7 @@ public class MySubProviderImplComponentTest {
     @Test
     void isSubscribed_NotSubscribedUserIdAndSubId_ReturnFalse() {
         // Given
-        String userId = "user01";
+        String userId = testUserId;
         Long subId = 999L;
 
         // When

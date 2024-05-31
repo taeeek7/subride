@@ -3,8 +3,8 @@ package com.subride.mysub.infra.in.web;
 
 import com.subride.common.dto.GroupSummaryDTO;
 import com.subride.common.dto.ResponseDTO;
-import com.subride.mysub.infra.common.util.TestDataGenerator;
 import com.subride.common.dto.SubInfoDTO;
+import com.subride.mysub.infra.common.util.TestDataGenerator;
 import com.subride.mysub.infra.out.adapter.MySubProviderImpl;
 import com.subride.mysub.infra.out.entity.MySubEntity;
 import com.subride.mysub.infra.out.feign.MyGroupFeignClient;
@@ -23,7 +23,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -47,7 +46,9 @@ public class MySubControllerSystemTest {
     private MyGroupFeignClient myGroupFeignClient;
 
     private MySubProviderImpl mySubProvider;
-    private String testUserId = "user01";
+    private String testUserId = TestDataGenerator.testUserId;
+    private Long testSubId = TestDataGenerator.testSubId;
+    private Long testGroupId = TestDataGenerator.testGroupId;
 
     @BeforeEach
     void setup() {
@@ -60,8 +61,9 @@ public class MySubControllerSystemTest {
 
         cleanup();  //테스트 데이터 모두 지움
 
-        List<MySubEntity> mySubEntities = TestDataGenerator.generateMySubEntities(testUserId);
+        List<MySubEntity> mySubEntities = TestDataGenerator.generateMySubEntities();
         mySubRepository.saveAll(mySubEntities);
+
     }
 
     @AfterEach
@@ -75,14 +77,12 @@ public class MySubControllerSystemTest {
         String url = "/api/my-subs?userId=" + testUserId;
 
         //-- Feign Client로 구독추천에 요청하는 수행을 Stubbing함
-        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = ResponseDTO.<List<GroupSummaryDTO>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
-        ResponseDTO<List<SubInfoDTO>> response = ResponseDTO.<List<SubInfoDTO>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
+        GroupSummaryDTO groupSummaryDTO = TestDataGenerator.generateGroupSumaryDTO();
+        ResponseDTO<List<GroupSummaryDTO>> myGroupListResponse = TestDataGenerator.generateResponseDTO(200, List.of(groupSummaryDTO));
+
+        SubInfoDTO subInfoDTO = TestDataGenerator.generateSubInfoDTO();
+        ResponseDTO<List<SubInfoDTO>> response = TestDataGenerator.generateResponseDTO(200, List.of(subInfoDTO));
+
         given(myGroupFeignClient.getMyGroupList(any())).willReturn(myGroupListResponse);
         given(subRecommendFeignClient.getSubInfoListByIds(any())).willReturn(response);
 
@@ -97,19 +97,17 @@ public class MySubControllerSystemTest {
 
     @Test
     void cancelSub_ValidUserAndSub_Success() {
-        mySubProvider.subscribeSub(1L, testUserId);  //--테스트 데이터 등록
+        String testId = "user02";
+        mySubProvider.subscribeSub(1L, testId);  //--테스트 데이터 등록
 
         // Given
-        MySubEntity mySubEntity = mySubRepository.findByUserId(testUserId).get(0);
+        MySubEntity mySubEntity = mySubRepository.findByUserId(testId).get(0);
         Long subId = mySubEntity.getSubId();
-        String url = "/api/my-subs/" + subId + "?userId=" + testUserId;
-        ResponseDTO<List<Long>> response = ResponseDTO.<List<Long>>builder()
-                .code(200)
-                .response(new ArrayList<>())
-                .build();
+        ResponseDTO<List<Long>> response = TestDataGenerator.generateResponseDTO(200, List.of(999L));
         given(myGroupFeignClient.getJoinSubIds(any())).willReturn(response);
 
         // When & Then
+        String url = "/api/my-subs/" + subId + "?userId=" + testId;
         webClient.delete().uri(url)
                 .exchange()
                 .expectStatus().isOk()

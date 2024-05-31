@@ -8,6 +8,7 @@ import com.subride.mysub.biz.dto.MySubDTO;
 import com.subride.mysub.biz.usecase.service.MySubServiceImpl;
 import com.subride.mysub.infra.common.config.SecurityConfig;
 import com.subride.mysub.infra.common.jwt.JwtTokenProvider;
+import com.subride.mysub.infra.common.util.TestDataGenerator;
 import com.subride.mysub.infra.out.adapter.MySubProviderImpl;
 import com.subride.mysub.infra.out.entity.MySubEntity;
 import com.subride.mysub.infra.out.feign.SubRecommendFeignClient;
@@ -64,10 +65,7 @@ public class MySubControllerComponentTest {
         given(mySubProvider.getMySubList(any())).willReturn(new ArrayList<>());
 
         // SubRecommendFeignClient의 동작을 Mocking
-        ResponseDTO<SubInfoDTO> responseDTO = ResponseDTO.<SubInfoDTO>builder()
-                .code(200)
-                .response(new SubInfoDTO())
-                .build();
+        ResponseDTO<SubInfoDTO> responseDTO = TestDataGenerator.generateResponseDTO(200, new SubInfoDTO());
         given(subRecommendFeignClient.getSubDetail(any())).willReturn(responseDTO);
 
         // When, Then
