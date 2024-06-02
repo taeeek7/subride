@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Setter
 @Builder
 public class TransferResponse {
+    private Long id;
     private String memberId;
     private BigDecimal amount;
     private LocalDate transferDate;

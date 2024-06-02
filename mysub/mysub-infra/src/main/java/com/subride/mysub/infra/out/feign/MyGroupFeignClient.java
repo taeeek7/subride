@@ -12,6 +12,6 @@ import java.util.List;
 public interface MyGroupFeignClient {
     @GetMapping("/api/my-groups")
     ResponseDTO<List<GroupSummaryDTO>> getMyGroupList(@RequestParam String userId);
-    @GetMapping("/sub-id-list")
+    @GetMapping("/api/my-groups/sub-id-list")
     ResponseDTO<List<Long>> getJoinSubIds(@RequestParam String userId);
 }

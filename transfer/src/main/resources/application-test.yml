@@ -4,8 +4,8 @@ spring:
   application:
     name: ${SPRING_APPLICATION_NAME:transfer-service}
   datasource:
-    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
-    url: ${DB_URL:jdbc:mysql://localhost:3306/transfer?createDatabaseIfNotExist=true&serverTimezone=Asia/Seoul}
+    driver-class-name: ${DB_DRIVER:org.testcontainers.jdbc.ContainerDatabaseDriver}
+    url: ${DB_URL:jdbc:tc:mysql:8.0.29:///transfer}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:P@ssw0rd$}
   jpa:
@@ -27,8 +27,3 @@ jwt:
 logging:
   level:
     root: INFO
-    org.springframework.security: DEBUG
-    com.subride.transfer: DEBUG
-feign:
-  mygroup:
-    url: ${MYGRP_URI:http://localhost:18083}

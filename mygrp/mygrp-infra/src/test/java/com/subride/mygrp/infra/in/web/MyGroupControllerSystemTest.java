@@ -33,7 +33,7 @@ import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-@WithMockUser
+@WithMockUser   //모의 사용자로 동작하게 함
 public class MyGroupControllerSystemTest {
     @Autowired
     private WebApplicationContext context;
@@ -59,7 +59,7 @@ public class MyGroupControllerSystemTest {
     void setup() {
         webClient = MockMvcWebTestClient
                 .bindToApplicationContext(context)
-                .apply(SecurityMockMvcConfigurers.springSecurity())     //인증과 권한 부여 처리
+                .apply(SecurityMockMvcConfigurers.springSecurity())
                 .configureClient()
                 .build();
 

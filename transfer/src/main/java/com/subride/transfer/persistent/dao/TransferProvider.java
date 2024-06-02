@@ -38,6 +38,7 @@ public class TransferProvider {
 
     private TransferResponse toTransferResponse(Transfer transfer) {
         return TransferResponse.builder()
+                .id(transfer.getId())
                 .memberId(transfer.getMemberId())
                 .amount(transfer.getAmount())
                 .transferDate(transfer.getTransferDate())

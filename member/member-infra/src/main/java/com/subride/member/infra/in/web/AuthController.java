@@ -5,7 +5,6 @@ import com.subride.common.util.CommonUtils;
 import com.subride.member.biz.domain.Member;
 import com.subride.member.biz.usecase.inport.IAuthService;
 import com.subride.member.infra.dto.*;
-import com.subride.member.infra.exception.InfraException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -32,77 +31,54 @@ public class AuthController {
     @Operation(operationId = "auth-signup", summary = "회원가입", description = "회원가입을 처리합니다.")
     @PostMapping("/signup")
     public ResponseEntity<ResponseDTO<String>> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
-        try {
-            authService.signup(authControllerHelper.getMemberFromRequest(signupRequestDTO),
-                    authControllerHelper.getAccountFromRequest(signupRequestDTO));
+        authService.signup(authControllerHelper.getMemberFromRequest(signupRequestDTO),
+                authControllerHelper.getAccountFromRequest(signupRequestDTO));
 
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "회원가입 성공", "회원 가입 되었습니다."));
-        } catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
-        }
+        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "회원가입 성공", "회원 가입 되었습니다."));
     }
 
     @Operation(operationId = "auth-login", summary = "로그인", description = "로그인 처리")
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO<JwtTokenDTO>> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        try {
-            Member member = authService.login(loginRequestDTO.getUserId(), loginRequestDTO.getPassword());
-            if (member != null) {
-                JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
-                return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "로그인 성공", jwtTokenDTO));
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "로그인 실패"));
-            }
-        } catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        Member member = authService.login(loginRequestDTO.getUserId(), loginRequestDTO.getPassword());
+        if (member != null) {
+            JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "로그인 성공", jwtTokenDTO));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "로그인 실패"));
         }
     }
 
     @Operation(operationId = "validate-token", summary = "인증 토큰 검증", description = "인증 토큰을 검증합니다.")
     @PostMapping("/verify")
     public ResponseEntity<ResponseDTO<Integer>> validate(@RequestBody JwtTokenVarifyDTO jwtTokenVarifyDTO) {
-        try {
-            log.info("** verify: {}", jwtTokenVarifyDTO.getToken());
-            int result = authControllerHelper.checkAccessToken(jwtTokenVarifyDTO.getToken());
-            log.info("** RESULT: {}", result);
-            Member member = authControllerHelper.getMemberFromToken(jwtTokenVarifyDTO.getToken());
+        //log.info("** verify: {}", jwtTokenVarifyDTO.getToken());
+        int result = authControllerHelper.checkAccessToken(jwtTokenVarifyDTO.getToken());
+        //log.info("** RESULT: {}", result);
+        Member member = authControllerHelper.getMemberFromToken(jwtTokenVarifyDTO.getToken());
 
-            if (member == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
-            }
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
+        }
 
-            if (authService.validateMemberAccess(member)) {
-                return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "토큰 검증 성공", result));
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonUtils.createFailureResponse(0, "접근 권한이 없습니다."));
-            }
-        } catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        if (authService.validateMemberAccess(member)) {
+            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "토큰 검증 성공", result));
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(CommonUtils.createFailureResponse(0, "접근 권한이 없습니다."));
         }
     }
 
     @Operation(operationId = "refresh-token", summary = "인증 토큰 갱신", description = "인증 토큰을 갱신합니다.")
     @PostMapping("/refresh")
     public ResponseEntity<ResponseDTO<JwtTokenDTO>> refresh(@RequestBody JwtTokenRefreshDTO jwtTokenRefreshDTO) {
-        try {
-            authControllerHelper.isValidRefreshToken(jwtTokenRefreshDTO.getRefreshToken());
-            Member member = authControllerHelper.getMemberFromToken(jwtTokenRefreshDTO.getRefreshToken());
-            if (member == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
-            }
-
-            JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "토큰 갱신 성공", jwtTokenDTO));
-        } catch (InfraException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(CommonUtils.createFailureResponse(e.getCode(), e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(CommonUtils.createFailureResponse(0, "서버 오류가 발생했습니다."));
+        authControllerHelper.isValidRefreshToken(jwtTokenRefreshDTO.getRefreshToken());
+        Member member = authControllerHelper.getMemberFromToken(jwtTokenRefreshDTO.getRefreshToken());
+        if (member == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
         }
+
+        JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
+        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "토큰 갱신 성공", jwtTokenDTO));
+
     }
 }
