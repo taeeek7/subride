@@ -18,7 +18,7 @@ public class MemberControllerHelper {
 
     public MemberInfoDTO getMemberInfo(String userId) {
         MemberEntity member = memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new InfraException("사용자 없음"));
+                .orElseThrow(() -> new InfraException(0, "사용자 없음"));
 
         MemberInfoDTO memberInfoDTO = new MemberInfoDTO();
         BeanUtils.copyProperties(member, memberInfoDTO);
@@ -29,7 +29,7 @@ public class MemberControllerHelper {
         List<MemberEntity> memberList = memberRepository.findByUserIdIn(userIdList);
 
         if (memberList.isEmpty()) {
-            throw new InfraException("검색할 회원정보 없음");
+            throw new InfraException(0, "검색할 회원정보 없음");
         }
 
         List<MemberInfoDTO> memberInfoDTOList = new ArrayList<>();

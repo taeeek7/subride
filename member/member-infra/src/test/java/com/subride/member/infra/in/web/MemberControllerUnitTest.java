@@ -1,7 +1,7 @@
 package com.subride.member.infra.in.web;
 
-import com.subride.common.dto.ResponseDTO;
 import com.subride.common.dto.MemberInfoDTO;
+import com.subride.common.dto.ResponseDTO;
 import com.subride.member.infra.exception.InfraException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,9 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /*
 단위 테스트 예시: Controller 테스트
@@ -66,19 +68,19 @@ class MemberControllerUnitTest {
         // given
         String userId = "invalidUser";
 
-        given(memberControllerHelper.getMemberInfo(userId)).willThrow(new InfraException("User not found"));
+        given(memberControllerHelper.getMemberInfo(userId)).willThrow(new InfraException(0, "User not found"));
 
         // when
-        ResponseEntity<ResponseDTO<MemberInfoDTO>> response = memberController.getMemberInfo(userId);
+        InfraException exception = null;
+        try {
+            memberController.getMemberInfo(userId);
+        } catch(InfraException e) {
+            exception = e;
+        }
 
         // then
-        assertNotNull(response);
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-
-        ResponseDTO<MemberInfoDTO> responseBody = response.getBody();
-        assertNotNull(responseBody);
-        assertNull(responseBody.getResponse());
-
+        assertNotNull(exception);
+        assertEquals(0, exception.getCode());
         verify(memberControllerHelper, times(1)).getMemberInfo(userId);
     }
 

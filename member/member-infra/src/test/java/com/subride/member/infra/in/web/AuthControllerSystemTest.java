@@ -105,7 +105,7 @@ public class AuthControllerSystemTest {
     }
 
     @Test
-    void login_unauthorized_unauthorized() {
+    void login_unauthorized() {
         // Given
         LoginRequestDTO loginRequestDTO = new LoginRequestDTO();
         loginRequestDTO.setUserId("testuser");
@@ -116,6 +116,6 @@ public class AuthControllerSystemTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(loginRequestDTO)
                 .exchange()
-                .expectStatus().isUnauthorized();
+                .expectStatus().isBadRequest();
     }
 }

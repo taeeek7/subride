@@ -1,5 +1,8 @@
 package com.subride.member.infra.exception;
 
+import lombok.Getter;
+
+@Getter
 public class InfraException extends RuntimeException {
     private int code;
 
@@ -20,5 +23,4 @@ public class InfraException extends RuntimeException {
         this.code = code;
     }
 
-    public int getCode() { return code; }
 }

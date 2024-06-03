@@ -41,12 +41,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<ResponseDTO<JwtTokenDTO>> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         Member member = authService.login(loginRequestDTO.getUserId(), loginRequestDTO.getPassword());
-        if (member != null) {
-            JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
-            return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "로그인 성공", jwtTokenDTO));
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "로그인 실패"));
-        }
+
+        JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
+        return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "로그인 성공", jwtTokenDTO));
+
     }
 
     @Operation(operationId = "validate-token", summary = "인증 토큰 검증", description = "인증 토큰을 검증합니다.")
@@ -56,10 +54,6 @@ public class AuthController {
         int result = authControllerHelper.checkAccessToken(jwtTokenVarifyDTO.getToken());
         //log.info("** RESULT: {}", result);
         Member member = authControllerHelper.getMemberFromToken(jwtTokenVarifyDTO.getToken());
-
-        if (member == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
-        }
 
         if (authService.validateMemberAccess(member)) {
             return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "토큰 검증 성공", result));
@@ -73,10 +67,6 @@ public class AuthController {
     public ResponseEntity<ResponseDTO<JwtTokenDTO>> refresh(@RequestBody JwtTokenRefreshDTO jwtTokenRefreshDTO) {
         authControllerHelper.isValidRefreshToken(jwtTokenRefreshDTO.getRefreshToken());
         Member member = authControllerHelper.getMemberFromToken(jwtTokenRefreshDTO.getRefreshToken());
-        if (member == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(CommonUtils.createFailureResponse(0, "사용자 없음"));
-        }
-
         JwtTokenDTO jwtTokenDTO = authControllerHelper.createToken(member);
         return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "토큰 갱신 성공", jwtTokenDTO));
 
