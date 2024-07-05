@@ -34,7 +34,7 @@ public class DataInitializer implements ApplicationRunner {
             List<SubEntity> subs = TestDataGenerator.generateSubEntities(categories);
             subRepository.saveAll(subs);
 
-            String[] userIds = {"user01", "user02", "user03", "user04", "user05"};
+            String[] userIds = {"user01", "user02", "user03", "user04", "user05", "cna01", "cna02", "cna03", "cna04", "cna05"};
             String[] categoryNames = categories.stream().map(CategoryEntity::getSpendingCategory).toArray(String[]::new);
             List<SpendingEntity> spendings = TestDataGenerator.generateSpendingEntities(userIds, categoryNames);
             spendingRepository.saveAll(spendings);
