@@ -1,14 +1,14 @@
 import os
 
 def merge_files(src_directories, output_file, extensions=['.java', '.yml', '.gradle']):
-    with open(output_file, 'w') as outfile:
+    with open(output_file, 'w', encoding='utf-8') as outfile:
         for src_directory in src_directories:
             for root, dirs, files in os.walk(src_directory):
                 for file in files:
                     if any(file.endswith(ext) for ext in extensions):
                         file_path = os.path.join(root, file)
                         try:
-                            with open(file_path, 'r') as infile:
+                            with open(file_path, 'r', encoding='utf-8') as infile:
                                 content = infile.read()
                                 if content:
                                     outfile.write(f"// File: {file_path}\n")
@@ -25,7 +25,7 @@ def merge_files(src_directories, output_file, extensions=['.java', '.yml', '.gra
             file_path = os.path.join(os.getcwd(), file_name)
             if os.path.isfile(file_path):
                 try:
-                    with open(file_path, 'r') as infile:
+                    with open(file_path, 'r', encoding='utf-8') as infile:
                         content = infile.read()
                         if content:
                             outfile.write(f"// File: {file_path}\n")
@@ -35,10 +35,11 @@ def merge_files(src_directories, output_file, extensions=['.java', '.yml', '.gra
                 except Exception as e:
                     print(f"Error reading {file_path}: {e}")
 
+
 if __name__ == "__main__":
     default_directories = "common member subrecommend mysub mygrp transfer"
     input_directories = input(f"# 소스 디렉토리명 (기본값: {default_directories}): ")
-    
+
     if input_directories.strip() == "":
         src_directories = default_directories.split()
     else:
@@ -47,4 +48,3 @@ if __name__ == "__main__":
     output_file = 'MergedSource.java'
     merge_files(src_directories, output_file)
     print(f"All files have been merged into {output_file}")
-
