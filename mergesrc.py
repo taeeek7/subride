@@ -21,8 +21,9 @@ def merge_files(src_directories, output_file, extensions=['.java', '.yml', '.gra
                             print(f"Error reading {file_path}: {e}")
 
         # 현재 디렉토리의 settings.gradle과 build.gradle 파일 추가
+        current_dir = os.path.abspath(os.path.dirname(__file__))
         for file_name in ['settings.gradle', 'build.gradle']:
-            file_path = os.path.join(os.getcwd(), file_name)
+            file_path = os.path.join(current_dir, file_name)
             if os.path.isfile(file_path):
                 try:
                     with open(file_path, 'r', encoding='utf-8') as infile:
