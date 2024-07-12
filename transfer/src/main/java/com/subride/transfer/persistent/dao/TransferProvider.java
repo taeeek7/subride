@@ -1,16 +1,26 @@
 package com.subride.transfer.persistent.dao;
 
+import com.google.gson.*;
+import com.subride.common.dto.GroupMemberDTO;
+import com.subride.common.dto.ResponseDTO;
 import com.subride.transfer.common.dto.TransferResponse;
-import com.subride.transfer.persistent.entity.Transfer;
 import com.subride.transfer.common.enums.Period;
 import com.subride.transfer.common.exception.TransferException;
+import com.subride.transfer.common.feign.MyGroupFeignClient;
+import com.subride.transfer.persistent.entity.Transfer;
 import com.subride.transfer.persistent.repository.ITransferMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,6 +28,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TransferProvider {
     private final ITransferMapper transferMapper;
+    private final MyGroupFeignClient myGroupFeignClient;
+    private final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDate.class, new TransferProvider.LocalDateAdapter())
+            .create();
 
     public List<TransferResponse> getTransferHistory(Long groupId, Period period) {
         LocalDate endDate = LocalDate.now();
@@ -47,5 +61,58 @@ public class TransferProvider {
                 .amount(transfer.getAmount())
                 .transferDate(transfer.getTransferDate())
                 .build();
+    }
+
+
+    public void createTestData() {
+        // 등록된 그룹의 참여자들 userId 가져오기
+        ResponseDTO<List<GroupMemberDTO>> response = myGroupFeignClient.getAllGroupMembers();
+        List<GroupMemberDTO> groupMembers = response.getResponse();
+        log.info("Group members: {}", gson.toJson(groupMembers));
+
+        List<Transfer> transfers = new ArrayList<>();
+        Random random = new Random();
+
+        for (GroupMemberDTO groupMember : groupMembers) {
+            Long groupId = groupMember.getGroupId();
+            Set<String> memberIds = groupMember.getMemberIds();
+            int paymentDay = groupMember.getPaymentDay();
+
+            for (String memberId : memberIds) {
+                LocalDate transferDate;
+                if (LocalDate.now().getDayOfMonth() >= paymentDay) {
+                    transferDate = LocalDate.now().withDayOfMonth(paymentDay);
+                } else {
+                    transferDate = LocalDate.now().minusMonths(1).withDayOfMonth(paymentDay);
+                }
+
+                for (int i = 0; i < 12; i++) {
+                    BigDecimal amount = BigDecimal.valueOf(random.nextInt(40001) + 10000);
+
+                    Transfer transfer = new Transfer();
+                    transfer.setGroupId(groupId);
+                    transfer.setMemberId(memberId);
+                    transfer.setAmount(amount);
+                    transfer.setTransferDate(transferDate);
+
+                    transfers.add(transfer);
+
+                    transferDate = transferDate.minusMonths(1);
+                }
+            }
+        }
+
+        log.info("Generated transfer data: {}", gson.toJson(transfers));
+
+        transferMapper.insertList(transfers);
+    }
+
+    private static class LocalDateAdapter implements JsonSerializer<LocalDate> {
+        private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+
+        @Override
+        public JsonElement serialize(LocalDate localDate, Type srcType, JsonSerializationContext context) {
+            return new JsonPrimitive(formatter.format(localDate));
+        }
     }
 }
