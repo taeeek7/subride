@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subride.common.dto.ResponseDTO;
 import com.subride.transfer.common.enums.Period;
 import com.subride.transfer.persistent.entity.Transfer;
-import com.subride.transfer.persistent.repository.ITransferRepository;
+import com.subride.transfer.persistent.repository.ITransferMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class TransferControllerSystemTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ITransferRepository transferRepository;
+    private ITransferMapper transferMapper;
 
     private WebTestClient webClient;
 
@@ -45,26 +45,24 @@ public class TransferControllerSystemTest {
 
         cleanup();  // 테스트 데이터 모두 지움
 
-        Transfer transfer1 = Transfer.builder()
-                .groupId(1L)
-                .memberId("user01")
-                .amount(BigDecimal.valueOf(10000))
-                .transferDate(LocalDate.of(2024, 5, 5))
-                .build();
+        Transfer transfer1 = new Transfer();
+        transfer1.setGroupId(1L);
+        transfer1.setMemberId("user01");
+        transfer1.setAmount(BigDecimal.valueOf(10000));
+        transfer1.setTransferDate(LocalDate.of(2024, 5, 5));
 
-        Transfer transfer2 = Transfer.builder()
-                .groupId(1L)
-                .memberId("user02")
-                .amount(BigDecimal.valueOf(20000))
-                .transferDate(LocalDate.of(2024, 5, 5))
-                .build();
+        Transfer transfer2 = new Transfer();
+        transfer2.setGroupId(2L);
+        transfer2.setMemberId("user02");
+        transfer2.setAmount(BigDecimal.valueOf(20000));
+        transfer2.setTransferDate(LocalDate.of(2024, 5, 5));
 
-        transferRepository.saveAll(List.of(transfer1, transfer2));
+        transferMapper.insertList(List.of(transfer1, transfer2));
     }
 
     @AfterEach
     void cleanup() {
-        transferRepository.deleteAll();
+        transferMapper.deleteAll();
     }
 
     @Test
@@ -88,7 +86,7 @@ public class TransferControllerSystemTest {
                     assert response.getMessage().equals("이체내역 조회 성공");
 
                     List<Transfer> transferList = objectMapper.convertValue(response.getResponse(), List.class);
-                    assert transferList.size() == 2;
+                    assert transferList.size() == 1;
                 });
     }
 

@@ -8,15 +8,16 @@ spring:
     url: ${DB_URL:jdbc:tc:mysql:8.0.29:///transfer}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:P@ssw0rd$}
-  jpa:
-    database: mysql
-    database-platform: org.hibernate.dialect.MySQLDialect
-    show-sql: ${JPA_SHOW_SQL:false}
-    hibernate:
-      ddl-auto: ${JPA_HIBERNATE_DDL_AUTO:update}
-    properties:
-      hibernate:
-        format_sql: ${JPA_HIBERNATE_FORMAT_SQL:true}
+  sql:
+    init:
+      mode: always   #시작시 테이블 존재 체크하고 없으면 생성
+      schema-locations: classpath:schema.sql  #Table 생성 SLQ
+
+mybatis:
+  type-aliases-package: com.subride.transfer.persistent.entity
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-handlers-package: com.subride.transfer.persistent.typehandler
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -27,3 +28,5 @@ jwt:
 logging:
   level:
     root: INFO
+    org.mybatis: TRACE
+

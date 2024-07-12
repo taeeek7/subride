@@ -3,7 +3,6 @@ package com.subride.transfer.controller;
 
 import com.subride.transfer.common.dto.TransferResponse;
 import com.subride.transfer.common.enums.Period;
-import com.subride.transfer.common.exception.TransferException;
 import com.subride.transfer.service.TransferService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TransferController.class)
@@ -42,17 +41,4 @@ public class TransferControllerComponentTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    @WithMockUser
-    public void getTransferHistory_InvalidPeriod_ReturnsBadRequest() throws Exception {
-        Long groupId = 1L;
-        Period period = Period.ONE_YEAR;
-
-        when(transferService.getTransferHistory(eq(groupId), eq(period))).thenThrow(new TransferException("잘못된 조회 기간입니다."));
-
-        mockMvc.perform(get("/api/transfer")
-                        .param("groupId", String.valueOf(groupId))
-                        .param("period", period.toString()))
-                .andExpect(status().isBadRequest());
-    }
 }

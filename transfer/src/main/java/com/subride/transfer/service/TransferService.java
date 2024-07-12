@@ -8,7 +8,7 @@ import com.subride.transfer.common.enums.Period;
 import com.subride.transfer.common.feign.MyGroupFeignClient;
 import com.subride.transfer.persistent.dao.TransferProvider;
 import com.subride.transfer.persistent.entity.Transfer;
-import com.subride.transfer.persistent.repository.ITransferRepository;
+import com.subride.transfer.persistent.repository.ITransferMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class TransferService {
     private final TransferProvider transferProvider;
-    private final ITransferRepository transferRepository;
+    private final ITransferMapper transferMapper;
     private final MyGroupFeignClient myGroupFeignClient;
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
@@ -62,12 +62,11 @@ public class TransferService {
                 for (int i = 0; i < 12; i++) {
                     BigDecimal amount = BigDecimal.valueOf(random.nextInt(40001) + 10000);
 
-                    Transfer transfer = Transfer.builder()
-                            .groupId(groupId)
-                            .memberId(memberId)
-                            .amount(amount)
-                            .transferDate(transferDate)
-                            .build();
+                    Transfer transfer = new Transfer();
+                    transfer.setGroupId(groupId);
+                    transfer.setMemberId(memberId);
+                    transfer.setAmount(amount);
+                    transfer.setTransferDate(transferDate);
 
                     transfers.add(transfer);
 
@@ -78,11 +77,11 @@ public class TransferService {
 
         log.info("Generated transfer data: {}", gson.toJson(transfers));
 
-        transferRepository.saveAll(transfers);
+        transferMapper.insertList(transfers);
     }
 
     public void deleteAllData() {
-        transferRepository.deleteAll();
+        transferMapper.deleteAll();
     }
 
     private static class LocalDateAdapter implements JsonSerializer<LocalDate> {
