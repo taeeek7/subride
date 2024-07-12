@@ -1,4 +1,4 @@
-package com.subride.transfer.persistent.dao;
+package com.subride.transfer.service;
 
 import com.google.gson.*;
 import com.subride.common.dto.GroupMemberDTO;
@@ -8,7 +8,7 @@ import com.subride.transfer.common.enums.Period;
 import com.subride.transfer.common.exception.TransferException;
 import com.subride.transfer.common.feign.MyGroupFeignClient;
 import com.subride.transfer.persistent.entity.Transfer;
-import com.subride.transfer.persistent.repository.ITransferMapper;
+import com.subride.transfer.persistent.dao.ITransferRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,13 +26,14 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TransferProvider {
-    private final ITransferMapper transferMapper;
+public class TransferServiceImpl implements ITransferService {
+    private final ITransferRepository transferRepository;
     private final MyGroupFeignClient myGroupFeignClient;
     private final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(LocalDate.class, new TransferProvider.LocalDateAdapter())
+            .registerTypeAdapter(LocalDate.class, new TransferServiceImpl.LocalDateAdapter())
             .create();
 
+    @Override
     public List<TransferResponse> getTransferHistory(Long groupId, Period period) {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate;
@@ -45,7 +46,7 @@ public class TransferProvider {
             throw new TransferException("잘못된 조회 기간입니다.");
         }
 
-        List<Transfer> transferList = transferMapper.findByGroupIdAndTransferDateBetween(groupId, startDate, endDate);
+        List<Transfer> transferList = transferRepository.findByGroupIdAndTransferDateBetween(groupId, startDate, endDate);
         log.debug("Transfer list: {}", transferList);
 
         return transferList.stream()
@@ -63,7 +64,7 @@ public class TransferProvider {
                 .build();
     }
 
-
+    @Override
     public void createTestData() {
         // 등록된 그룹의 참여자들 userId 가져오기
         ResponseDTO<List<GroupMemberDTO>> response = myGroupFeignClient.getAllGroupMembers();
@@ -104,7 +105,7 @@ public class TransferProvider {
 
         log.info("Generated transfer data: {}", gson.toJson(transfers));
 
-        transferMapper.insertList(transfers);
+        transferRepository.insertList(transfers);
     }
 
     private static class LocalDateAdapter implements JsonSerializer<LocalDate> {
@@ -116,7 +117,8 @@ public class TransferProvider {
         }
     }
 
+    @Override
     public void deleteAllData() {
-        transferMapper.deleteAll();
+        transferRepository.deleteAll();
     }
 }

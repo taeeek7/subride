@@ -3,7 +3,7 @@ package com.subride.transfer.controller;
 
 import com.subride.transfer.common.dto.TransferResponse;
 import com.subride.transfer.common.enums.Period;
-import com.subride.transfer.service.TransferService;
+import com.subride.transfer.service.ITransferService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -24,7 +24,7 @@ public class TransferControllerComponentTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private TransferService transferService;
+    private ITransferService transferService;
 
     @Test
     @WithMockUser

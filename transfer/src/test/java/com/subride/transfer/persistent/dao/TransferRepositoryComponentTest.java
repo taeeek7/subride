@@ -3,7 +3,6 @@ package com.subride.transfer.persistent.dao;
 import com.subride.transfer.common.config.SecurityConfig;
 import com.subride.transfer.common.jwt.JwtTokenProvider;
 import com.subride.transfer.persistent.entity.Transfer;
-import com.subride.transfer.persistent.repository.ITransferMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Import({SecurityConfig.class, JwtTokenProvider.class})
 public class TransferRepositoryComponentTest {
     @Autowired
-    private ITransferMapper transferMapper;
+    private ITransferRepository transferMapper;
 
     @BeforeEach
     void setup() {
@@ -66,12 +65,12 @@ public class TransferRepositoryComponentTest {
         assertThat(transfers).hasSize(2);
         assertThat(transfers.get(0).getGroupId()).isEqualTo(groupId);
         assertThat(transfers.get(0).getMemberId()).isEqualTo("user01");
-        assertThat(transfers.get(0).getAmount()).isEqualTo(BigDecimal.valueOf(10000));
+        assertThat(transfers.get(0).getAmount()).isEqualByComparingTo(BigDecimal.valueOf(10000));
         assertThat(transfers.get(0).getTransferDate()).isEqualTo(LocalDate.of(2024, 6, 1));
 
         assertThat(transfers.get(1).getGroupId()).isEqualTo(groupId);
         assertThat(transfers.get(1).getMemberId()).isEqualTo("user02");
-        assertThat(transfers.get(1).getAmount()).isEqualTo(BigDecimal.valueOf(20000));
+        assertThat(transfers.get(1).getAmount()).isEqualByComparingTo(BigDecimal.valueOf(20000));
         assertThat(transfers.get(1).getTransferDate()).isEqualTo(LocalDate.of(2024, 7, 1));
     }
 

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subride.common.dto.ResponseDTO;
 import com.subride.transfer.common.enums.Period;
 import com.subride.transfer.persistent.entity.Transfer;
-import com.subride.transfer.persistent.repository.ITransferMapper;
+import com.subride.transfer.persistent.dao.ITransferRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ public class TransferControllerSystemTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ITransferMapper transferMapper;
+    private ITransferRepository transferMapper;
 
     private WebTestClient webClient;
 

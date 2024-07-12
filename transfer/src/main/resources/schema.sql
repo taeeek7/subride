@@ -1,7 +1,8 @@
-CREATE TABLE IF NOT EXISTS transfer (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    group_id BIGINT NOT NULL,
-    member_id VARCHAR(255) NOT NULL,
-    amount DECIMAL(19, 0) NOT NULL,
-    transfer_date DATE NOT NULL
-);
+CREATE TABLE IF NOT EXISTS `transfer` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `group_id` bigint DEFAULT NULL,
+  `member_id` varchar(255) DEFAULT NULL,
+  `amount` decimal(38,0) DEFAULT NULL,
+  `transfer_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

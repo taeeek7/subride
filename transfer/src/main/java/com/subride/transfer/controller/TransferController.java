@@ -4,7 +4,7 @@ import com.subride.common.dto.ResponseDTO;
 import com.subride.common.util.CommonUtils;
 import com.subride.transfer.common.dto.TransferResponse;
 import com.subride.transfer.common.enums.Period;
-import com.subride.transfer.service.TransferService;
+import com.subride.transfer.service.ITransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -23,7 +23,7 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class TransferController {
-    private final TransferService transferService;
+    private final ITransferService transferService;
 
     @Operation(summary = "이체내역 조회", description = "특정 그룹의 이체내역을 조회합니다.")
     @Parameters({
@@ -44,7 +44,6 @@ public class TransferController {
     public ResponseEntity<ResponseDTO<Void>> createTestData() {
         transferService.createTestData();
         return ResponseEntity.ok(CommonUtils.createSuccessResponse(200, "테스트 데이터 생성 성공", null));
-
     }
 
     @Operation(summary = "전체 데이터 삭제", description = "모든 이체 데이터를 삭제합니다.")

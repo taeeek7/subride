@@ -1,4 +1,4 @@
-package com.subride.transfer.persistent.repository;
+package com.subride.transfer.persistent.dao;
 
 import com.subride.transfer.persistent.entity.Transfer;
 import org.apache.ibatis.annotations.Param;
@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper
 @Repository
 @SuppressWarnings("unused")
-public interface ITransferMapper {
+public interface ITransferRepository {
     List<Transfer> findByGroupIdAndTransferDateBetween(@Param("groupId") Long groupId, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
     void save(Transfer transfer);
     void deleteAll();

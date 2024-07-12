@@ -595,7 +595,7 @@ import com.subride.transfer.common.dto.TransferResponse;
 import com.subride.transfer.persistent.entity.Transfer;
 import com.subride.transfer.common.enums.Period;
 import com.subride.transfer.common.exception.TransferException;
-import com.subride.transfer.persistent.repository.ITransferMapper;
+import com.subride.transfer.persistent.dao.ITransferMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -739,7 +739,7 @@ import com.subride.transfer.common.enums.Period;
 import com.subride.transfer.common.feign.MyGroupFeignClient;
 import com.subride.transfer.persistent.dao.TransferProvider;
 import com.subride.transfer.persistent.entity.Transfer;
-import com.subride.transfer.persistent.repository.ITransferMapper;
+import com.subride.transfer.persistent.dao.ITransferMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
