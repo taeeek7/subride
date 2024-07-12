@@ -1,7 +1,7 @@
 package com.subride.transfer.persistent.repository;
 
 import com.subride.transfer.persistent.entity.Transfer;
-import org.springframework.data.repository.query.Param;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

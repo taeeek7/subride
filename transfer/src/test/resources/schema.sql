@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS transfer (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    group_id BIGINT NOT NULL,
+    member_id VARCHAR(255) NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    transfer_date DATE NOT NULL
+);
