@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,10 +43,14 @@ public class MyGroupProviderImpl implements IMyGroupProvider {
         Group group = toGroup(groupEntity, subInfoDTO);
 
         // MemberFeignClient를 사용하여 사용자 정보 조회
-        String userIds = String.join(",", groupEntity.getMemberIds());
-        ResponseDTO<List<MemberInfoDTO>> responseMember = memberFeignClient.getMemberInfoList(userIds);
-        List<MemberInfoDTO> memberInfoDTOList = responseMember.getResponse();
-        group.setMembers(memberInfoDTOList);
+        if(!groupEntity.getMemberIds().isEmpty()) {
+            String userIds = String.join(",", groupEntity.getMemberIds());
+            ResponseDTO<List<MemberInfoDTO>> responseMember = memberFeignClient.getMemberInfoList(userIds);
+            List<MemberInfoDTO> memberInfoDTOList = responseMember.getResponse();
+            group.setMembers(memberInfoDTOList);
+        } else {
+            group.setMembers(new ArrayList<>());
+        }
 
         return group;
     }
