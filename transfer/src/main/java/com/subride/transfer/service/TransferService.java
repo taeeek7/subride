@@ -22,4 +22,8 @@ public class TransferService {
     public void createTestData() {
         transferProvider.createTestData();
     }
+
+    public void deleteAllData() {
+        transferProvider.deleteAllData();
+    }
 }

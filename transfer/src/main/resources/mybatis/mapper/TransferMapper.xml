@@ -10,7 +10,7 @@
         <result property="transferDate" column="transfer_date" javaType="java.time.LocalDate"/>
     </resultMap>
 
-    <select id="findByGroupIdAndTransferDateBetween" resultMap="transferResultMap">
+    <select id="findByGroupIdAndTransferDateBetween" resultType="Transfer" resultMap="transferResultMap">
         SELECT * FROM transfer
         WHERE group_id = #{groupId}
         AND transfer_date BETWEEN #{startDate} AND #{endDate}

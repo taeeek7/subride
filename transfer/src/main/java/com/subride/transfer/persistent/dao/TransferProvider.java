@@ -115,4 +115,8 @@ public class TransferProvider {
             return new JsonPrimitive(formatter.format(localDate));
         }
     }
+
+    public void deleteAllData() {
+        transferMapper.deleteAll();
+    }
 }
